@@ -1,0 +1,49 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    {{html_title}}
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+<p>
+    <form id="selected_form">       <!--나중에 db에서 값 가져오기-->
+        <h3>음료선택</h3> 
+        <select id="selected_drink">
+            <option id="drink0">스위트아메리카노</option>
+            <option id="drink1">카페라떼</option>
+        </select>
+    </form>
+</p>
+<p>
+    <form id="updating_form" onsubmit="alert('수정하기!');">
+        <fieldset>
+            <legend>스위트아메리카노</legend>
+            <table>
+                <tr>
+                    <td><input type="radio" name="remove_radio"></td>
+                    <td><select><option>물</option></select></td>
+                    <td><input type="text" value="150"></td>
+                    
+                </tr>
+                <tr>
+                    <td><input type="radio" name="remove_radio"></td>
+                    <td><select><option>에스프레소</option></select></td>
+                    <td><input type="text" value="25"></td>
+                </tr>
+                <tr>
+                    <td><input type="radio" name="remove_radio"></td>
+                    <td><select><option>슈가시럽</option></select></td>
+                    <td><input type="text" value="25"></td>
+                </tr>            
+            </table>
+        </fieldset>
+        <input type="submit" id="updating_remove" value="삭제하기">
+        <input type="submit" id="updating_add" value="추가하기">
+        <input type="submit" id="updating_update" value="수정하기">           
+    </form>
+</p>
+
+{% endblock %}

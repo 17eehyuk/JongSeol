@@ -1,0 +1,58 @@
+* {margin: 0; padding: 0}       /*css reset*/
+
+html{
+    background-color: #fcf7ee;
+}
+
+
+header{
+    border-bottom: 1px solid gray;
+    background-color: #7896BC;
+    padding: 20px;
+}
+header a{
+    padding-left: 20px;
+    text-decoration: none;
+    color: #eefcf7;
+}
+
+nav{
+    border-right: 1px solid gray;
+    width: 8vw;
+    height: 100vh;
+    float: left;
+    background-color: darkcyan;
+}
+nav ul{    
+    padding-top: 15px;
+}
+nav li{
+    text-align: center;   
+}
+
+nav a{
+    text-decoration: none;
+    color: bisque;
+    font-size: 20px;
+}
+
+article{
+    float: left;
+    padding: 20px;
+}
+
+#team_introducing_picture{
+    float: left;
+}
+
+
+table {
+    border: 1px solid #444444;
+    border-collapse: collapse;
+  }
+th, td {
+    width: 100px;
+    text-align: center;
+    border: 1px solid #444444;
+    padding: 10px;
+  }

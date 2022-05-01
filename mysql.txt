@@ -1,0 +1,6 @@
+1. 테이블 nozzles 생성
+
+USE jongseol;
+
+CREATE TABLE nozzles(nozzle_id integer NOT NULL UNIQUE, drink_name varchar(10));
+

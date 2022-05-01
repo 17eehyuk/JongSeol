@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            {% block title %}
+            {% endblock %}
+        </title>
+        <meta charset="utf-8">
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            <h1><a href="{{ url_for('index') }}">ShotSharing(전자종합설계 목234 분반 3조)</a></h1>
+        </header>
+        <nav>
+            <ol>
+                <li><a href="{{ url_for('managing') }}">관리</a></li>
+                <li><a href="{{ url_for('making') }}">제작</a></li>
+                <li><a href="{{ url_for('editing') }}">편집</a></li>
+                <li><a href="{{ url_for('sharing') }}">공유</a></li>
+                {# 나중에 구현하기 <li><a href="">추천</a></li> #}
+            </ol>
+        </nav>
+        <article>
+            {% block content %}
+            {% endblock %}
+        </article>
+    </body>
+</html>

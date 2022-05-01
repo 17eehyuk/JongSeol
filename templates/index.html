@@ -1,0 +1,14 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    {{html_title}}
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+<img id="team_introducing_picture" src="{{ url_for('static', filename='images/model.png') }}"><br>
+3조 입니다.  
+
+{% endblock %}

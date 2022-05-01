@@ -1,0 +1,52 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    {{html_title}}
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+<p>
+    <form id="selected_form">       <!--나중에 db에서 값 가져오기-->
+        <h3>음료선택</h3> 
+        <select id="selected_drink">
+            <option id="drink0">바닐라라떼</option>
+            <option id="drink1">카라멜마끼아또</option>
+        </select>
+        
+    </form>
+</p>
+<p>
+    <form id="making_form" onsubmit="alert('추가하기!');">
+        <fieldset>
+            <legend>바닐라라떼</legend>
+            <table>
+                <tr>
+                    <td>물</td>
+                    <td><input type="text" value="150"></td>
+                </tr>
+                <tr>
+                    <td>에스프레소</td>
+                    <td><input type="text" value="25"></td>
+                </tr>
+                <tr>
+                    <td>슈가시럽</td>
+                    <td><input type="text" value="25"></td>
+                </tr>            
+            </table>
+        </fieldset>
+        <input type="submit" id="updating_add" value="추가하기">           
+    </form>
+</p>
+
+<p>
+    <hr>평균 3점<hr>                    
+    한줄 코멘트<br>
+    5점 a : 맛있어요<br>
+    1점 b : 맛없어요<br>
+    3점 c : 보통이에요
+</p>
+
+{% endblock %}
