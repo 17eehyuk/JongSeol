@@ -8,6 +8,8 @@ import app_sql
 # SubmitField : submit 버튼
 # DataRequired : 유효성검사
 
+manager = {'id':'3jo', 'pw':'whdtjf123'}
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "super secret"   #보안용
 
@@ -19,6 +21,11 @@ class NameForm(FlaskForm):
 @app.route('/')
 def index():
     return render_template('index.html',html_title='메인')
+
+@app.route('/login/', methods=['POST'])
+def login():
+    return render_template('login.html',html_title='로그인')
+
 
 @app.route('/managing/', methods=['GET', 'POST'])
 def managing():
@@ -34,12 +41,20 @@ def managing():
         return redirect('/managing/')       #GET으로 전송시키기
     elif request.method == 'GET':
         return render_template('managing.html',html_title='관리', html_nozzles=nozzles, html_update=0)
-    
 
 @app.route('/managing_process/', methods=['POST'])
 def managing_process():
-    nozzles = app_sql.fetchall_data('nozzles')
-    return render_template('managing.html',html_title='관리', html_nozzles=nozzles, html_update=1)
+    id = request.form['id']
+    pw = request.form['pw']
+    #로그인
+    if manager['id']==id and manager['pw']==pw:
+        nozzles = app_sql.fetchall_data('nozzles')
+        return render_template('managing.html',html_title='관리', html_nozzles=nozzles, html_update=1)
+    else:
+        return render_template('login_failed.html',html_title='로그인실패')
+
+
+    
 
 
 @app.route('/making/')
