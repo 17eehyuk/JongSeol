@@ -1,0 +1,30 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    로그인
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+<h2>로그인</h2>
+<br>
+<form method="post">
+    <table>
+        <tr>
+            <th width="50px">{{ form.user_id.label }}</th>
+            <td>{{ form.user_id }}</td>
+        </tr>
+        <tr>
+            <th>{{ form.user_pw.label }}</th>
+            <td>{{ form.user_pw }}</td>
+        </tr>
+    </table>
+    <br>
+    <input type="submit" value="로그인" formaction="/login_process/">
+</form>
+
+
+
+{% endblock %}

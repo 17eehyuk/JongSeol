@@ -1,0 +1,39 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    관리자
+{% endblock %}
+
+
+<!--내용-->
+{% block content %}
+
+<form method="POST">
+    <table border="1px">
+        <tr>
+            <th>유저</th>
+            <th>삭제</th>
+            <th>전송</th>
+        </tr>
+        <tr>
+            <td>
+                <select name="user_id" style="width: 90px;">
+                    {% for user in all_users %}
+                        {% if user != 'admin' %}
+                        <option>{{user}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>  
+            </td>
+            <td>
+                <input type="checkbox" name="drop_user" value="1" style="width: 90px;">
+            </td>
+            <td>
+                <input type="submit" value="유저삭제" formaction="/drop_process/" style="width: 90px;">
+            </td>
+        </tr>
+    </table>   
+</form>
+
+{% endblock %}

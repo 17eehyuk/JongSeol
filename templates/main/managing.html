@@ -1,0 +1,48 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    관리
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+
+{% if update == 0 %}
+<h2>노즐정보</h2>
+<form method="post">
+    <table border="1px">
+        <tr>
+            <th>노즐번호</th>
+            <th>음료</th>
+        </tr>
+        {% for num, nozzle in range(8)|zip(nozzles) %}
+        <tr>
+            <td>{{num}}</td>
+            <td>{{nozzle}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <input type="submit" formaction="/managing/" value="수정하기">
+</form>
+{% else %}
+<h2>노즐수정</h2>
+<form method="post">
+    <table border="1px">
+        <tr>
+            <th>노즐번호</th>
+            <th>음료</th>
+        </tr>
+        {% for num, nozzle in range(8)|zip(nozzles) %}
+        <tr>
+            <td>{{num}}</td>
+            <td><input type="text" value="{{nozzle}}" name="nozzle{{num}}"></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <input type="submit" formaction="/managing_process/" value="저장하기">
+</form>
+{% endif %}
+
+{% endblock %}

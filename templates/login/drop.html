@@ -1,0 +1,33 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    회원탈퇴
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+<h2>회원탈퇴</h2>
+<br>
+'{{ user_id }}' 님 정말로 탈퇴하시겠습니까?
+<br>
+<table>
+    <tr>
+        <td>
+            <form method="post">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+                <input type="submit" style="width: 50px;" value="네" formaction="/drop_process/">    
+            </form>
+        </td>
+        <td>
+            <form>
+                <input type="submit" style="width: 50px;" value="아니요" formaction="/">
+            </form>
+        </td>
+    </tr>    
+</table>
+
+
+
+{% endblock %}

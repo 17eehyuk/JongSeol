@@ -10,18 +10,51 @@
     </head>
     <body>
         <header>
-            <h1><a href="{{ url_for('index') }}">ShotSharing(전자종합설계 목234 분반 3조)</a></h1>
+            <div id="login">
+                {% if login_state == True %}
+                    
+                    {% if user_id == 'admin' %}
+                        관리자
+                        <form method="post">
+                            <input type="submit" style="width: 90px;" value="로그아웃" formaction="/logout/">
+                            <input type="submit" style="width: 90px;" value="관리자페이지" formaction="/admin/">
+                        </form>
+                    {% else %}
+                        {{ user_id }}님 반가워요
+                        <form method="post">
+                            <input type="submit" style="width: 90px;" value="로그아웃" formaction="/logout/">
+                            <input type="submit" style="width: 90px;" value="회원탈퇴" formaction="/drop/">
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <a href="/login/">로그인</a>
+                    <a href="/register/">회원가입</a>
+                {% endif %}
+            </div>
+            <h1><a href="/">ShotSharing(전자종합설계 목234 분반 3조)</a></h1>
+                       
         </header>
         <nav>
             <ol>
-                <li><a href="{{ url_for('managing') }}">관리</a></li>
-                <li><a href="{{ url_for('making') }}">제조</a></li>
-                <li><a href="{{ url_for('editing') }}">편집</a></li>
-                <li><a href="{{ url_for('sharing') }}">공유</a></li>
-                {# 나중에 구현하기 <li><a href="">추천</a></li> #}
+                <li><a href="/managing/">관리</a></li>
+                {# 나중에 구현하기
+                    
+                    <li><a href="{{ url_for('making') }}">제조</a></li>
+                    <li><a href="{{ url_for('editing') }}">편집</a></li>
+                    <li><a href="{{ url_for('sharing') }}">공유</a></li>
+                    <li><a href="">추천</a></li>
+                #}
+                
+
             </ol>
         </nav>
         <article>
+            {% if message_state == True %}
+                <h2><a href="/">홈으로</a></h2>
+                <br>
+                {{ frame_message }}                
+            {% endif %}
+
             {% block content %}
             {% endblock %}
         </article>

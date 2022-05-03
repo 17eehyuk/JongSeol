@@ -4,6 +4,9 @@ html{
     background-color: #fcf7ee;
 }
 
+a{
+    color: #5daaee;
+}
 
 header{
     border-bottom: 1px solid gray;
@@ -45,7 +48,7 @@ article{
     float: left;
 }
 
-
+/*
 table {
     border: 1px solid #444444;
     border-collapse: collapse;
@@ -56,3 +59,18 @@ th, td {
     border: 1px solid #444444;
     padding: 10px;
   }
+
+
+*/
+#login {
+    color: #47494f;
+    float: right;
+}
+
+
+#register li{
+    /*회원가입시 사용하는 CSS*/
+    list-style:none;
+    float: left;
+    margin-right: 10px;
+}

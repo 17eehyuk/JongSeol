@@ -1,6 +1,33 @@
-1. 테이블 nozzles 생성
+#DB생성(UTF8)
+CREATE DATABASE tmpdb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE tmpdb;
+#DB삭제
+DROP DATABASE tmpdb;
 
-USE jongseol;
 
-CREATE TABLE nozzles(nozzle_id integer NOT NULL UNIQUE, drink_name varchar(10));
+#users
+CREATE TABLE users(
+id VARCHAR(10) UNIQUE NOT NULL ,
+pw VARCHAR(50) NOT NULL,
+sex CHAR(1) NOT NULL,
+yb CHAR(4) NOT NULL 
+);
 
+
+#nozzles
+CREATE TABLE nozzles(
+id VARCHAR(10) UNIQUE NOT NULL ,
+nozzle0 varchar(10),
+nozzle1 varchar(10),
+nozzle2 varchar(10),
+nozzle3 varchar(10),
+nozzle4 varchar(10),
+nozzle5 varchar(10),
+nozzle6 varchar(10),
+nozzle7 varchar(10)
+);
+
+SELECT * FROM tmpdb.nozzles WHERE id='A';
+UPDATE tmpdb.nozzles SET nozzle0 = '커피' WHERE id = 'A';
+UPDATE tmpdb.nozzles SET nozzle0 = '커피', nozzle1 = '우유' WHERE id = 'A';
+COMMIT;

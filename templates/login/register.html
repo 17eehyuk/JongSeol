@@ -1,0 +1,36 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    회원가입
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+<h2>회원가입</h2>
+<br>
+<form id="register" method="post">
+    <table>
+        <tr>
+            <th width="100">{{ form.user_id.label }}</th>
+            <td>{{ form.user_id }}</td>
+        </tr>
+        <tr>
+            <th>{{ form.user_pw.label }}</th>
+            <td>{{ form.user_pw }}</td>
+        </tr>
+        <tr>
+            <th>{{ form.user_sex.label }}</th>
+            <td>{{ form.user_sex }}</td>
+        </tr>
+        <tr>
+            <th>{{ form.user_yb.label }}</th>
+            <td>{{ form.user_yb }}</td>
+        </tr>
+    </table>
+    <br>
+    <input type="submit" value="회원가입" formaction="/register_process/">
+</form>
+
+{% endblock %}
