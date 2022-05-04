@@ -9,40 +9,72 @@
 {% block content %}
 
 
-{% if update == 0 %}
+{% if nozzle_update == 0 %}
 <h2>노즐정보</h2>
+<br>
 <form method="post">
     <table border="1px">
         <tr>
-            <th>노즐번호</th>
-            <th>음료</th>
+            <th width="80px">노즐번호</th>
+            <th width="200px">음료</th>
         </tr>
         {% for num, nozzle in range(8)|zip(nozzles) %}
         <tr>
-            <td>{{num}}</td>
-            <td>{{nozzle}}</td>
+            <td style="text-align: center;">{{num}}</td>
+            <td style="text-align: center;">{{nozzle}}</td>
         </tr>
         {% endfor %}
     </table>
-    <input type="submit" formaction="/managing/" value="수정하기">
+    <input type="submit" formaction="/managing/" value="수정하기" style="width: 90px;">
 </form>
+
+<br>
+<h2>계정</h2>
+<br>
+
+    
+<table border="1px">
+    <tr>
+        <th width="100px">성별</th>
+        <th width="100px">태어난해</th>
+        <th width="100px">정보수정</th>
+        <th width="100px">회원탈퇴</th>
+    </tr>
+    <tr>
+        <td style="text-align: center;">{{ my_profile['sex'] }}</td>
+        <td style="text-align: center;">{{ my_profile['yb']}}</td>
+        <td>
+            <form method="post">
+                <input type="hidden" value="{{ my_profile['sex'] }}" name="sex">
+                <input type="hidden" value="{{ my_profile['yb'] }}" name="yb">
+                <input type="submit" style="width: 100px;" value="정보수정" formaction="/update_user/" style="width: 100px;">
+            </form>
+        </td>
+        <td><form method="post"><input type="submit" style="width: 100px;" value="회원탈퇴" formaction="/drop_user/"></form></td>
+    </tr>
+</table>
+    
+
+
+
 {% else %}
 <h2>노즐수정</h2>
 <form method="post">
     <table border="1px">
         <tr>
-            <th>노즐번호</th>
-            <th>음료</th>
+            <th width="80px">노즐번호</th>
+            <th width="200px">음료</th>
         </tr>
-        {% for num, nozzle in range(8)|zip(nozzles) %}
+        {% for nozzle_num, nozzle in range(8)|zip(nozzles) %}
         <tr>
-            <td>{{num}}</td>
-            <td><input type="text" value="{{nozzle}}" name="nozzle{{num}}"></td>
+            <td style="text-align: center;">{{nozzle_num}}</td>
+            <td><input type="text" maxlength="10" value="{{nozzle}}" name="nozzle{{nozzle_num}}" style="width: 200px;"></td>
         </tr>
         {% endfor %}
     </table>
-    <input type="submit" formaction="/managing_process/" value="저장하기">
+    <input type="submit" formaction="/managing_process/" value="저장하기" style="width: 90px;">
 </form>
 {% endif %}
+
 
 {% endblock %}

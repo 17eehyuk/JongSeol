@@ -8,6 +8,14 @@ a{
     color: #5daaee;
 }
 
+li{
+    /*회원가입시 사용하는 CSS*/
+    list-style:none;
+    float: left;
+    margin-right: 10px;
+}
+
+
 header{
     border-bottom: 1px solid gray;
     background-color: #7896BC;
@@ -30,6 +38,7 @@ nav ul{
     padding-top: 15px;
 }
 nav li{
+    float: none;
     text-align: center;   
 }
 
@@ -48,29 +57,12 @@ article{
     float: left;
 }
 
-/*
-table {
-    border: 1px solid #444444;
-    border-collapse: collapse;
-  }
-th, td {
-    width: 100px;
-    text-align: center;
-    border: 1px solid #444444;
-    padding: 10px;
-  }
 
-
-*/
 #login {
     color: #47494f;
     float: right;
 }
 
-
-#register li{
-    /*회원가입시 사용하는 CSS*/
-    list-style:none;
-    float: left;
-    margin-right: 10px;
+#update input[type=password], #update input[type=number]{
+    width: 150px;
 }

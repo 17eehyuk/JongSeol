@@ -1,6 +1,6 @@
+from multiprocessing.spawn import old_main_modules
 from flask import Flask, render_template, request, redirect, session
-from my_modules import my_pysql
-from my_modules import  my_wtforms
+from my_modules import my_pysql, my_wtforms
 
 app = Flask(__name__)
 app.secret_key = "ssijfo@#!@#123"       #session을 사용하기 위해서는 반드시 있어야함
@@ -14,43 +14,53 @@ def index():
     else:
         return render_template('index.html', login_state=False)
 
-
+############################################################### main ###############################################################
 @app.route('/managing/', methods=['GET', 'POST'])
 def managing():
     if request.method == 'GET':
-        if 'session_id' in session:         
-            return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzls(session['session_id']), update=0)
+        if 'session_id' in session:
+            my_profile = my_pysql.my_profile(session['session_id'])
+            return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzls(session['session_id']), nozzle_update=0, my_profile=my_profile)
         else:
-            return redirect('/login/')
+            return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
     elif request.method == 'POST':
-       return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzls(session['session_id']), update=1)
+       return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzls(session['session_id']), nozzle_update=1)
+
+@app.route('/making/', methods=['GET', 'POST'])
+def making():
+    if request.method == 'GET':
+        if 'session_id' in session:
+            return render_template('./main/making.html', login_state=True, user_id=session['session_id'])
+        else:
+            return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
+    elif request.method == 'POST':
+       return render_template('./main/making.html', login_state=True, user_id=session['session_id'])
 
 
+
+
+
+
+
+
+############################################################### main_processes ###############################################################
 @app.route('/managing_process/', methods=['POST'])
 def managing_process():
     new_datas = ''
     for key, value in dict(request.form).items():
         new_datas = new_datas + f'''{key}='{value}','''
-    new_datas = new_datas[:-1]
+    # 마지막 콤마(,) 제거
+    new_datas = new_datas[:-1]                              # nozzle0='우유',nozzle1='',nozzle2='커피',nozzle3='',nozzle4='',nozzle5='',nozzle6='',nozzle7=''
     my_pysql.nozzle_update(new_datas, session['session_id'])
     return redirect('/managing/')
 
 
 
-# 에러관련
-@app.errorhandler(404)
-def page_not_found(error):
-    return render_template('./errs/404.html')
-@app.errorhandler(405)
-def page_not_found(error):
-    return render_template('./errs/405.html')
 
 
-# 로그인관련
-@app.route('/admin/', methods=['POST'])
-def admin():
-    return render_template('./login/admin.html', login_state=True, user_id=session['session_id'], all_users=my_pysql.all_users())
-    
+
+
+############################################################### login ###############################################################  
 @app.route('/login/')
 def login():
     if 'session_id' in session:     # 이미 로그인한 상태
@@ -65,6 +75,27 @@ def register():
     else:
         return render_template('./login/register.html', form = my_wtforms.register_form(), login_state = False)
 
+@app.route('/logout/', methods=['post'])
+def logout():
+    session.pop('session_id')      # session에서 제거
+    return redirect('/')
+
+@app.route('/update_user/', methods=['post'])
+def update_user():
+    old_profile = dict(request.form)
+    return render_template('./login/update_user.html', login_state=True, user_id=session['session_id'], my_profile=my_pysql.my_profile(session['session_id']), old_profile = old_profile)
+
+
+@app.route('/drop_user/', methods=['post'])
+def drop_user():
+    #print(request.form)
+    return render_template('./login/drop_user.html', login_state=True, user_id=session['session_id'])
+
+@app.route('/admin/', methods=['POST'])
+def admin():
+    return render_template('./login/admin.html', login_state=True, user_id=session['session_id'], all_users=my_pysql.all_users())
+
+############################################################### login_processes ###############################################################  
 @app.route('/login_process/', methods=['POST'])
 def login_process():
     user_id = request.form['user_id']
@@ -88,18 +119,14 @@ def register_process():
     sql_message =my_pysql.register(user_id, user_pw, user_sex, user_yb)      # return값을 반환하기 때문('이미 존재하는 회원', '회원가입 완료')
     return render_template('frame.html', message_state = True, frame_message = sql_message)
 
-
-@app.route('/drop/', methods=['post'])
-def user_drop():
-    return render_template('./login/drop.html', login_state=True, user_id=session['session_id'])
-
 @app.route('/drop_process/', methods=['post'])
 def drop_process():
     if session['session_id'] == 'admin':
         # 체크가 안돼있으면 에러 발생 따라서 try/except 이용
         try:
-            if request.form['drop_user'] == '1':
-                sql_message = my_pysql.drop_user(request.form['user_id'])
+            if request.form['selcetd_user'] == '1':
+                if request.form['user_id'] != 'admin':
+                    sql_message = my_pysql.drop_user(request.form['user_id'])
         except:
             pass
         return render_template('./login/admin.html', login_state=True, user_id=session['session_id'], all_users=my_pysql.all_users())  
@@ -109,10 +136,34 @@ def drop_process():
             session.pop('session_id')      # session에서 제거
         return render_template('frame.html', message_state = True, frame_message = sql_message)
 
-@app.route('/logout/', methods=['post'])
-def logout():
-    session.pop('session_id')      # session에서 제거
-    return redirect('/')
+@app.route('/pw_clear_process/', methods=['post'])
+def pw_clear_process():
+    # 체크가 안돼있으면 에러 발생 따라서 try/except 이용
+    try:
+        if request.form['selcetd_user'] == '1':
+            if request.form['user_id'] != 'admin':
+                    my_pysql.pw_clear(request.form['user_id'])
+    except:
+        pass
+    return render_template('./login/admin.html', login_state=True, user_id=session['session_id'], all_users=my_pysql.all_users())  
 
 
-app.run(host='0.0.0.0', port=5000, debug=True)
+@app.route('/update_process/', methods=['post'])      
+def update_process():
+    new_sex = request.form['user_sex']
+    new_yb = request.form['user_yb']
+    new_pw = request.form['user_pw']
+    my_pysql.update_profile(new_sex, new_yb, new_pw, session['session_id'])
+    return redirect('/managing/')
+
+############################################################### errs ###############################################################
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('./errs/404.html')
+@app.errorhandler(405)
+def page_not_found(error):
+    return render_template('./errs/405.html')
+
+####################################################################################################################################
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)

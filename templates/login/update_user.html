@@ -1,0 +1,41 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    정보수정
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+<h2>정보수정</h2>
+- 새비밀번호 공란시 비밀번호 변경없음(기존비밀번호 그대로 사용)
+<br>
+<br>
+<form method="post" id="update">
+    <table border="1px">
+        <tr>
+            <th width="120px">성별</th>
+            <th width="150px">태어난해</th>
+            <th width="150px">새비밀번호</th>
+        </tr>
+        <tr>
+            <td style="text-align: center;">
+                {% if old_profile['sex'] == 'M' %}
+                <input checked="" id="user_sex-0" name="user_sex" type="radio" value="M">남자</label>  
+                <input id="user_sex-1" name="user_sex" type="radio" value="F">여자</label>
+                {% else %}
+                <input id="user_sex-0" name="user_sex" type="radio" value="M">남자</label>  
+                <input checked="" id="user_sex-1" name="user_sex" type="radio" value="F">여자</label>
+                {% endif %}
+            </td>
+            <td><input id="user_yb" max="2004" min="1900" name="user_yb" required="" type="number" value="{{old_profile['yb']}}"></td>
+            <td><input id="user_pw" maxlength="10" name="user_pw" type="password" value=""></td>         
+        </tr>
+    </table>
+    <input type="submit" value="저장하기" formaction="/update_process/" style="width: 90px;">
+</form>
+
+
+
+{% endblock %}

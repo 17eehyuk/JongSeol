@@ -9,31 +9,43 @@
 <!--내용-->
 {% block content %}
 
+<h2>유저관리</h2>
+
 <form method="POST">
     <table border="1px">
         <tr>
             <th>유저</th>
-            <th>삭제</th>
-            <th>전송</th>
+            <th>선택</th>
+            <th>유저삭제</th>
+            <th>PW초기화</th>
         </tr>
         <tr>
             <td>
-                <select name="user_id" style="width: 90px;">
-                    {% for user in all_users %}
-                        {% if user != 'admin' %}
-                        <option>{{user}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>  
+                <input type="text" id="user_id" name="user_id" style="width: 90px;">
             </td>
             <td>
-                <input type="checkbox" name="drop_user" value="1" style="width: 90px;">
+                <input type="checkbox" name="selcetd_user" value="1" style="width: 90px;">
             </td>
             <td>
                 <input type="submit" value="유저삭제" formaction="/drop_process/" style="width: 90px;">
             </td>
+            <td>
+                <input type="submit" value="초기화" formaction="/pw_clear_process/" style="width: 90px;">
+            </td>
         </tr>
     </table>   
 </form>
+<br>
 
+<br>
+
+<h2>유저목록</h2>
+<select id="copy_id" style="width: 200px;">
+    {% for user in all_users %}
+        {% if user != 'admin' %}
+        <option>{{user}}</option>
+        {% endif %}
+    {% endfor %}
+</select>
+<input type="button" value="전송" onclick="transmit_id()" style="width: 90px;">
 {% endblock %}

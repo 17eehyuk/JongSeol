@@ -11,13 +11,12 @@
 <h2>회원탈퇴</h2>
 <br>
 '{{ user_id }}' 님 정말로 탈퇴하시겠습니까?
-<br>
 <table>
     <tr>
         <td>
             <form method="post">
                 <input type="hidden" name="user_id" value="{{ user_id }}">
-                <input type="submit" style="width: 50px;" value="네" formaction="/drop_process/">    
+                <input type="submit" style="width: 50px;" value="네" formaction="/drop_process/" onclick="alert('그동안 이용해주셔서 감사힙니다.')">    
             </form>
         </td>
         <td>
@@ -27,7 +26,6 @@
         </td>
     </tr>    
 </table>
-
 
 
 {% endblock %}

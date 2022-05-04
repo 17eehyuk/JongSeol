@@ -6,24 +6,24 @@
             {% endblock %}
         </title>
         <meta charset="utf-8">
-        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='./css/style.css') }}" rel="stylesheet">
+        <script src="{{ url_for('static', filename='./js/my_js.js') }}"></script>
     </head>
     <body>
         <header>
             <div id="login">
                 {% if login_state == True %}
                     
-                    {% if user_id == 'admin' %}
-                        관리자
+                    {% if user_id == 'admin' %}                        
                         <form method="post">
+                            관리자
                             <input type="submit" style="width: 90px;" value="로그아웃" formaction="/logout/">
                             <input type="submit" style="width: 90px;" value="관리자페이지" formaction="/admin/">
                         </form>
                     {% else %}
-                        {{ user_id }}님 반가워요
                         <form method="post">
-                            <input type="submit" style="width: 90px;" value="로그아웃" formaction="/logout/">
-                            <input type="submit" style="width: 90px;" value="회원탈퇴" formaction="/drop/">
+                            {{ user_id }}님 반가워요
+                            <input type="submit" style="width: 90px;" value="로그아웃" formaction="/logout/">                            
                         </form>
                     {% endif %}
                 {% else %}
@@ -37,9 +37,10 @@
         <nav>
             <ol>
                 <li><a href="/managing/">관리</a></li>
+                <li><a href="/making/">제조</a></li>
                 {# 나중에 구현하기
                     
-                    <li><a href="{{ url_for('making') }}">제조</a></li>
+                    
                     <li><a href="{{ url_for('editing') }}">편집</a></li>
                     <li><a href="{{ url_for('sharing') }}">공유</a></li>
                     <li><a href="">추천</a></li>

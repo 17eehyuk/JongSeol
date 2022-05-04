@@ -1,4 +1,5 @@
-from unittest import result
+from traceback import print_tb
+from click import command
 import pymysql
 
 #MySQL 접속
@@ -34,7 +35,7 @@ def register(id, pw, sex, yb):
         mydb.commit()
         #노즐 정보를 만들어줌
         command = f'''
-        INSERT INTO nozzles(id) VALUES('{id}');
+        INSERT INTO nozzles VALUES('{id}' ,'', '', '', '', '', '', '', '');
         '''
         sql_cursor.execute(command)
         mydb.commit()
@@ -58,7 +59,34 @@ def drop_user(id):
         sql_cursor.execute(command)
         mydb.commit()
     return f'''사용자 '{id}' 탈퇴 성공'''
-        
+
+#개인정보확인
+def my_profile(id):
+    command = f'''
+        SELECT sex, yb FROM USERS WHERE id='{id}';
+    '''
+    sql_cursor.execute(command)
+    return sql_cursor.fetchone()
+
+def update_profile(sex, yb, pw, id):
+
+    if pw == '':        
+        #비밀번호 변경X
+        command = f'''
+        UPDATE users SET sex='{sex}', yb='{yb}' WHERE id = '{id}';
+        '''
+        sql_cursor.execute(command)
+        mydb.commit()
+        return print('업데이트성공')
+    else:
+        #비밀번호 까지 변경
+        command = f'''
+            UPDATE users SET sex='{sex}', yb='{yb}', pw=password('{pw}') WHERE id = '{id}';
+        '''
+        sql_cursor.execute(command)
+        mydb.commit()
+        return print('업데이트성공')
+
 #모든유저출력
 def all_users():
     command = f'''
@@ -71,7 +99,19 @@ def all_users():
         users.append(table['id'])
     return users
 
+#PW초기화(1234로 초기화시킴)    #admin만 가능
+def pw_clear(id):
+    #비밀번호 까지 변경
+    command = f'''
+        UPDATE users SET pw=password('1234') WHERE id = '{id}';
+    '''
+    sql_cursor.execute(command)
+    mydb.commit()
+    return print('비밀번호 초기화 성공(1234)')
 
+
+
+    
 #노즐출력
 def nozzls(id):
     command = f'''
