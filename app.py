@@ -1,4 +1,3 @@
-from multiprocessing.spawn import old_main_modules
 from flask import Flask, render_template, request, redirect, session
 from my_modules import my_pysql, my_wtforms
 
@@ -20,11 +19,11 @@ def managing():
     if request.method == 'GET':
         if 'session_id' in session:
             my_profile = my_pysql.my_profile(session['session_id'])
-            return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzls(session['session_id']), nozzle_update=0, my_profile=my_profile)
+            return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzles(session['session_id']), nozzle_update=0, my_profile=my_profile)
         else:
             return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
     elif request.method == 'POST':
-       return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzls(session['session_id']), nozzle_update=1)
+       return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzles(session['session_id']), nozzle_update=1)
 
 @app.route('/making/', methods=['GET', 'POST'])
 def making():
@@ -37,8 +36,16 @@ def making():
        return render_template('./main/making.html', login_state=True, user_id=session['session_id'])
 
 
-
-
+@app.route('/recipe/', methods=['GET', 'POST'])
+def recipe():
+    if request.method == 'GET':
+        if 'session_id' in session:
+            return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'])
+        else:
+            return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
+    elif request.method == 'POST':
+        print(request.form)
+        return redirect('/')
 
 
 
@@ -159,11 +166,17 @@ def update_process():
 ############################################################### errs ###############################################################
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template('./errs/404.html')
+    if 'session_id' in session:
+        return render_template('./errs/404.html', login_state=True, user_id=session['session_id'])
+    else:
+        return render_template('./errs/404.html', login_state=False)
+
 @app.errorhandler(405)
 def page_not_found(error):
-    return render_template('./errs/405.html')
-
+    if 'session_id' in session:
+        return render_template('./errs/405.html', login_state=True, user_id=session['session_id'])
+    else:
+        return render_template('./errs/405.html', login_state=False)
 ####################################################################################################################################
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

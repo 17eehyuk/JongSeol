@@ -1,5 +1,3 @@
-from traceback import print_tb
-from click import command
 import pymysql
 
 #MySQL 접속
@@ -108,8 +106,6 @@ def pw_clear(id):
     sql_cursor.execute(command)
     mydb.commit()
     return print('비밀번호 초기화 성공(1234)')
-
-
 
     
 #노즐출력
