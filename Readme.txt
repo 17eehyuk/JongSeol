@@ -8,3 +8,7 @@ app.py : 메인
 pip install flask
 pip install flask_wtf
 pip install pymysql
+
+
+우선 모터 8개 기준으로 제작
+만약에 모터개수가 바뀐다면 recipes table, my_js.js, my_pysql.py 수정하기

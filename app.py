@@ -44,7 +44,7 @@ def recipe():
         else:
             return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
     elif request.method == 'POST':
-        print(request.form)
+        my_pysql.new_recipe(session['session_id'], request.form)
         return redirect('/')
 
 

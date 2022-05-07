@@ -28,12 +28,14 @@ function valid_dect(){
 
     var drinks = [];
     var amount_sum = 0;
+    var drink_name = $('#drink_name').val();
+
     //id가져오기
     for(var i=0; i<row_count; i++){
       drink = $(`#drink${i}`).val();  //val : content 접근
       amount = $(`#drink${i}_amount`).val();
 
-      if(drink=='' || amount==''){return alert('데이터를 입력하세요')}
+      if(drink=='' || amount=='' || drink_name==''){return alert('데이터를 입력하세요')}
       else{
         drinks[i] = drink
         amount_sum = amount_sum + Number(amount)
@@ -56,17 +58,17 @@ function valid_dect(){
     if(valid_flag==0){
       
       //.attr : 속성추가
-      $('input[type=text]').attr("readonly",true)     //글자수정불가
-      $('input[type=number]').attr("readonly",true)   //숫자수정불가
-      $('input[type=text]').css("background-color", "#D3D3D3")     //글자수정색변경
-      $('input[type=number]').css("background-color", "#D3D3D3")   //숫자수정색변경
+      $('#drink_name').attr("readonly",true)          //레시피이름 수정불가
+      $('input[type=text]').attr("readonly",true)     //글자 수정불가
+      $('input[type=number]').attr("readonly",true)   //숫자 수정불가
+      $('input[type=text]').css("background-color", "#D3D3D3")     //글자수정 색변경
+      $('input[type=number]').css("background-color", "#D3D3D3")   //숫자수정 색변경
 
-
-      $('#append_table_btn').attr("disabled",true)    //행추가불가
-      $('#pop_table_btn').attr("disabled",true)       //행삭제불가
-      $('#valid_dect_btn').attr("disabled",true)      //유효성검사불가
-      $('#recipe_update_btn').attr("disabled",false)  //업데이트가능
-      $('input[type=submit]').attr("disabled",false)  //제출가능
+      $('#append_table_btn').attr("disabled",true)    //행추가 불가
+      $('#pop_table_btn').attr("disabled",true)       //행삭제 불가
+      $('#valid_dect_btn').attr("disabled",true)      //유효성검사 불가
+      $('#recipe_update_btn').attr("disabled",false)  //업데이트 가능
+      $('input[type=submit]').attr("disabled",false)  //제출 가능
     }
     else{
       if(dup_flag==1){return alert(`음료 '${dup_drink}' 중복`)}
@@ -76,6 +78,7 @@ function valid_dect(){
 
 function recipe_update(){
   row_count = Number($('#row_count').val())
+  $('#drink_name').attr("readonly",false)          //레시피이름 수정불가
   $('input[type=text]').attr("readonly",false)
   $('input[type=number]').attr("readonly",false)
   $('input[type=text]').css("background-color", "#FFFFFF")     //글자수정색변경

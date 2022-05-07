@@ -109,7 +109,7 @@ def pw_clear(id):
 
     
 #노즐출력
-def nozzls(id):
+def nozzles(id):
     command = f'''
     SELECT * FROM nozzles WHERE id='{id}';
     '''
@@ -123,3 +123,19 @@ def nozzle_update(new_datas, id):
     sql_cursor.execute(command)
     mydb.commit()
     return print('업데이트성공')
+
+def new_recipe(id, dic):
+    keys ='id,'
+    values = f''''{id}','''
+    for key, value in dict(dic).items():
+        keys = keys + key + ','
+        values = values + "'" + value + "'" + ","
+    keys = keys[:-1]
+    values = values[:-1] 
+
+    command = f'''
+    INSERT INTO recipes ({keys}) values  ({values});
+    '''
+    sql_cursor.execute(command)
+    mydb.commit()
+    return print('레시피 추가 성공')

@@ -11,6 +11,9 @@ DROP DATABASE tmpdb;
 #DB생성(UTF8)
 CREATE DATABASE tmpdb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
+#Table 삭제
+DROP TABLE users;
+
 #users
 CREATE TABLE users(
 id VARCHAR(10) UNIQUE NOT NULL ,
@@ -22,21 +25,35 @@ yb CHAR(4) NOT NULL
 #nozzles
 CREATE TABLE nozzles(
 id VARCHAR(10) UNIQUE NOT NULL ,
-nozzle0 varchar(10),
-nozzle1 varchar(10),
-nozzle2 varchar(10),
-nozzle3 varchar(10),
-nozzle4 varchar(10),
-nozzle5 varchar(10),
-nozzle6 varchar(10),
-nozzle7 varchar(10)
+nozzle0 VARCHAR(10),
+nozzle1 VARCHAR(10),
+nozzle2 VARCHAR(10),
+nozzle3 VARCHAR(10),
+nozzle4 VARCHAR(10),
+nozzle5 VARCHAR(10),
+nozzle6 VARCHAR(10),
+nozzle7 VARCHAR(10)
 );
 
 #recipes
 CREATE TABLE recipes(
-id VARCHAR(10) UNIQUE NOT NULL ,
-drink0 varchar(10),
-amount0 char(3),
-drink1 varchar(10),
-amount1 char(3)
+id VARCHAR(10),
+drink_name VARCHAR(10),
+drink0 VARCHAR(10),
+drink0_amount CHAR(3),
+drink1 VARCHAR(10),
+drink1_amount CHAR(3),
+drink2 VARCHAR(10),
+drink2_amount CHAR(3),
+drink3 VARCHAR(10),
+drink3_amount CHAR(3),
+drink4 VARCHAR(10),
+drink4_amount CHAR(3),
+drink5 VARCHAR(10),
+drink5_amount CHAR(3),
+drink6 VARCHAR(10),
+drink6_amount CHAR(3),
+drink7 VARCHAR(10),
+drink7_amount CHAR(3)
 );
+
