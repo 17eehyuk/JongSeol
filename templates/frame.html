@@ -19,7 +19,7 @@
                         <form method="post">
                             관리자
                             <input type="submit" style="width: 90px;" value="로그아웃" formaction="/logout/">
-                            <input type="submit" style="width: 90px;" value="관리자페이지" formaction="/admin/">
+                            {# 나중에 다시 구현하기 <input type="submit" style="width: 90px;" value="관리자페이지" formaction="/admin/"> #}
                         </form>
                     {% else %}
                         <form method="post">
@@ -38,11 +38,10 @@
         <nav>
             <ol>
                 <li><a href="/managing/">관리</a></li>
-                <li><a href="/making/">제조</a></li>
                 <li><a href="/recipe/">레시피</a></li>
                 {# 나중에 구현하기
                     
-                    
+                    <li><a href="/making/">제조</a></li>
                     <li><a href="{{ url_for('editing') }}">편집</a></li>
                     <li><a href="{{ url_for('sharing') }}">공유</a></li>
                     <li><a href="">추천</a></li>

@@ -1,0 +1,34 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    레시피보기
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+
+<h2>{{ recipe_name }}</h2>
+<form method="post">
+<input type="hidden" name="recipe_name" value="{{ recipe_name }}">
+
+<table border="1px">
+    <tr>
+        <th>음료명</th>
+        <th>음료양</th>
+    </tr>
+    {% for key, value in recipe.items() %}
+    <tr>
+        <td>{{key}}</td>
+        <td>{{value}}</td>
+    </tr>
+    {% endfor %}    
+</table>
+
+<input type="submit" formaction="/delete_recipe/" value="삭제하기">
+</form>
+
+
+
+{% endblock %}

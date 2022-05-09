@@ -1,0 +1,37 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    새 레시피
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+<h2>새 레시피</h2>
+음료이름은 중복불가, 각 음료는 600이하, 모든 음료양의 합은 700이하, 행은 최대 8개
+<br>
+<br>
+<form method="post">
+    <input type="hidden" id="row_count" value="1" disabled>  <!-- 행개수 -->
+    <input type="text" id="recipe_name" name="recipe_name" placeholder="레시피이름">
+    <table border="1">
+        <tbody id='recipe'>
+            <tr>
+                <th>음료명</th>
+                <th>음료양</th>
+            </tr>
+            <tr id="row0">
+                <td><input type="text" name="drink0" id="drink0" placeholder="0번음료"></td>
+                <td><input type="number" name="drink0_amount" id="drink0_amount" placeholder="0번음료양(0~600)" oninput="num_only(this); NO_over_600(this)"></td>
+            </tr>
+        </tbody>
+    </table>
+    <input type="button" id="valid_dect_btn" onclick="valid_dect()" value="유효성검사">
+    <input type="button" id="append_table_btn" onclick="append_table()" value="행추가">
+    <input type="button" id="pop_table_btn" onclick="pop_table()" value="마지막행삭제" disabled>            
+    <input type="button" id="recipe_update_btn" onclick="recipe_update()" value="수정하기" disabled>
+    <input type="submit" value="저장하기" disabled formaction="/new_recipe_process/">
+</form>
+
+{% endblock %}

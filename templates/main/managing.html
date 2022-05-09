@@ -10,7 +10,7 @@
 
 
 {% if nozzle_update == 0 %}
-<h2>노즐정보</h2>
+<h2>이 기기의 노즐정보</h2>
 <br>
 <form method="post">
     <table border="1px">
@@ -25,7 +25,9 @@
         </tr>
         {% endfor %}
     </table>
+    {% if user_id == 'admin' %}
     <input type="submit" formaction="/managing/" value="수정하기" style="width: 90px;">
+    {% endif %}
 </form>
 
 <br>

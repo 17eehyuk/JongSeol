@@ -2,12 +2,17 @@ from flask import Flask, render_template, request, redirect, session
 from my_modules import my_pysql, my_wtforms
 
 app = Flask(__name__)
-app.secret_key = "ssijfo@#!@#123"       #session을 사용하기 위해서는 반드시 있어야함
-app.jinja_env.filters['zip'] = zip
+app.secret_key = "ssijfo@#!@#123"       # session을 사용하기 위해서는 반드시 있어야함
+app.jinja_env.filters['zip'] = zip      # jinja에서 zip 함수 사용하기 위함
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    # 더미코드
+    try:
+        request.form
+    except:
+        pass
     if 'session_id' in session:
         return render_template('index.html', login_state=True, user_id=session['session_id'])
     else:
@@ -19,11 +24,11 @@ def managing():
     if request.method == 'GET':
         if 'session_id' in session:
             my_profile = my_pysql.my_profile(session['session_id'])
-            return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzles(session['session_id']), nozzle_update=0, my_profile=my_profile)
+            return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzles('admin'), nozzle_update=0, my_profile=my_profile)
         else:
             return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
     elif request.method == 'POST':
-       return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzles(session['session_id']), nozzle_update=1)
+       return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzles('admin'), nozzle_update=1)
 
 @app.route('/making/', methods=['GET', 'POST'])
 def making():
@@ -36,18 +41,47 @@ def making():
        return render_template('./main/making.html', login_state=True, user_id=session['session_id'])
 
 
-@app.route('/recipe/', methods=['GET', 'POST'])
+
+@app.route('/recipe/')
 def recipe():
-    if request.method == 'GET':
-        if 'session_id' in session:
-            return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'])
-        else:
-            return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
-    elif request.method == 'POST':
-        my_pysql.new_recipe(session['session_id'], request.form)
-        return redirect('/')
+    if 'session_id' in session:
+            return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']))
+    else:
+        return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
+        
 
 
+
+@app.route('/new_recipe/', methods=['POST'])
+def new_recipe():
+    # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
+    try:
+        request.form
+    except:
+        pass
+    return render_template('./main/new_recipe.html', login_state=True, user_id=session['session_id'])
+
+
+@app.route('/show_recipe/', methods=['POST'])
+def show_recipe():
+    # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
+    recipe_name = request.form['recipe_name']
+    tmp_recipe = list(my_pysql.show_detail_recipe(session['session_id'], recipe_name).values())        # 반드시 파이썬 3.7버전 이상 안그러면 dict의 순서 보장X 따라서 오류발생!!
+    recipe_name = tmp_recipe[1]
+    tmp_recipe = tmp_recipe[2:]
+    result_dict = {}
+    for i in range(int(len(tmp_recipe)/2)):
+        result_dict[tmp_recipe[2*i]] = tmp_recipe[2*i+1]
+
+    # {'id': 'cc', 'recipe_name': 'a', 'drink0': 'a', 'drink0_amount': '123'}
+    return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] ,recipe_name=recipe_name ,recipe = result_dict)
+
+
+@app.route('/delete_recipe/', methods=['POST'])
+def delete_recipe():
+    # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
+    recipe_name = request.form['recipe_name']
+    return render_template('./main/delete_recipe.html', login_state=True, user_id=session['session_id'] ,recipe_name=recipe_name)
 
 
 ############################################################### main_processes ###############################################################
@@ -61,6 +95,15 @@ def managing_process():
     my_pysql.nozzle_update(new_datas, session['session_id'])
     return redirect('/managing/')
 
+@app.route('/new_recipe_process/', methods=['POST'])
+def new_recipe_process():
+    my_pysql.new_recipe(session['session_id'], request.form)
+    return redirect('/recipe/')
+
+@app.route('/delete_recipe_process/', methods=['POST'])
+def delete_recipe_process():
+    my_pysql.delete_recipe(session['session_id'], request.form['recipe_name'])
+    return redirect('/recipe/')
 
 
 

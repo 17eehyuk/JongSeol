@@ -1,3 +1,4 @@
+from click import command
 import pymysql
 
 #MySQL 접속
@@ -32,11 +33,12 @@ def register(id, pw, sex, yb):
         sql_cursor.execute(command)         # 중복인 경우 에러 발생하므로 try/except 사용
         mydb.commit()
         #노즐 정보를 만들어줌
-        command = f'''
-        INSERT INTO nozzles VALUES('{id}' ,'', '', '', '', '', '', '', '');
-        '''
-        sql_cursor.execute(command)
-        mydb.commit()
+        if(id=='admin'):
+            command = f'''
+            INSERT INTO nozzles VALUES('{id}' ,'', '', '', '', '', '', '', '');
+            '''
+            sql_cursor.execute(command)
+            mydb.commit()
         return f'''{id}님 회원가입을 축하드립니다.'''
     except:
         return f'''아이디 : '{id}' 중복입니다. 다른 아이디를 사용해 주세요'''
@@ -124,18 +126,74 @@ def nozzle_update(new_datas, id):
     mydb.commit()
     return print('업데이트성공')
 
-def new_recipe(id, dic):
-    keys ='id,'
-    values = f''''{id}','''
-    for key, value in dict(dic).items():
-        keys = keys + key + ','
-        values = values + "'" + value + "'" + ","
-    keys = keys[:-1]
-    values = values[:-1] 
 
+
+
+def dup_check(id, recipe_name):
+    # 레시피명 중복인지 확인
+    # 이 값이 None 이면 중복이 없고 아니면 중복이 있는거
     command = f'''
-    INSERT INTO recipes ({keys}) values  ({values});
+    SELECT * FROM recipes WHERE id= '{id}' AND recipe_name='{recipe_name}';
+    '''
+    sql_cursor.execute(command)
+    return sql_cursor.fetchone()
+
+
+def new_recipe(id, dic):
+    tmp_dict = dict(dic)
+    if dup_check(id, tmp_dict['recipe_name']) == None:
+        keys ='id,'
+        values = f''''{id}','''
+        for key, value in tmp_dict.items():
+            keys = keys + key + ','
+            values = values + "'" + value + "'" + ","
+        keys = keys[:-1]
+        values = values[:-1] 
+
+        command = f'''
+        INSERT INTO recipes ({keys}) values  ({values});
+        '''
+        sql_cursor.execute(command)
+        mydb.commit()
+        return print('레시피 추가 성공')
+    else:
+        return print('레시피명 중복')
+
+
+    
+
+
+def my_recipes(id):
+    command = f'''
+    SELECT recipe_name FROM recipes WHERE id='{id}';
+    '''
+    sql_cursor.execute(command)
+    recipes =  sql_cursor.fetchall()
+    result = []
+    for recipe in recipes:        
+        result.append(recipe['recipe_name'])
+    return result
+
+def show_detail_recipe(id, recipe_name):
+    # list로 출력됨
+    command = f'''
+    SELECT * FROM recipes WHERE id= '{id}' AND recipe_name='{recipe_name}';
+    '''
+    sql_cursor.execute(command)
+    result = {}
+    result_dict = dict(sql_cursor.fetchone())
+    for key, value in result_dict.items():
+        if value == None:
+            continue
+        else:
+            result[key] = value
+    
+    return result
+
+def delete_recipe(id, recipe_name):
+    command = f'''
+    DELETE FROM recipes WHERE id= '{id}' AND recipe_name='{recipe_name}';
     '''
     sql_cursor.execute(command)
     mydb.commit()
-    return print('레시피 추가 성공')
+    return print('삭제완료')

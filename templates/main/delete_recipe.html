@@ -1,0 +1,21 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    레시피삭제
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+
+<h2>{{ recipe_name }}를 정말로 삭제하시겠습니까?</h2>
+<form method="post">
+<input type="hidden" name="recipe_name" value="{{ recipe_name }}">
+<input type="submit" formaction="/delete_recipe_process/" value="삭제하기">
+<input type="submit" formaction="/" value="홈으로">
+</form>
+
+
+
+{% endblock %}

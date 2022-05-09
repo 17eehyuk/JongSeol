@@ -38,7 +38,7 @@ nozzle7 VARCHAR(10)
 #recipes
 CREATE TABLE recipes(
 id VARCHAR(10),
-drink_name VARCHAR(10),
+recipe_name VARCHAR(10),
 drink0 VARCHAR(10),
 drink0_amount CHAR(3),
 drink1 VARCHAR(10),

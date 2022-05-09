@@ -66,3 +66,8 @@ article{
 #update input[type=password], #update input[type=number]{
     width: 150px;
 }
+
+td{
+    width: 100px;
+    text-align: center;
+}
