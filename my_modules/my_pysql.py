@@ -1,4 +1,3 @@
-from click import command
 import pymysql
 
 #MySQL 접속
@@ -68,6 +67,7 @@ def my_profile(id):
     sql_cursor.execute(command)
     return sql_cursor.fetchone()
 
+#개인정보 수정
 def update_profile(sex, yb, pw, id):
 
     if pw == '':        
@@ -109,36 +109,15 @@ def pw_clear(id):
     mydb.commit()
     return print('비밀번호 초기화 성공(1234)')
 
-    
-#노즐출력
-def nozzles(id):
-    command = f'''
-    SELECT * FROM nozzles WHERE id='{id}';
-    '''
-    sql_cursor.execute(command)
-    return list(dict(sql_cursor.fetchone()).values())[1:]       # [None, None, None, None, None, None, None, None]
-
-def nozzle_update(new_datas, id):
-    command = f'''
-    UPDATE nozzles SET {new_datas} WHERE id = '{id}';
-    '''
-    sql_cursor.execute(command)
-    mydb.commit()
-    return print('업데이트성공')
-
-
-
-
+#레시피명 중복인지 확인 (return 값이 None이면 중복 없음, 아닌경우 중복존재)
 def dup_check(id, recipe_name):
-    # 레시피명 중복인지 확인
-    # 이 값이 None 이면 중복이 없고 아니면 중복이 있는거
     command = f'''
     SELECT * FROM recipes WHERE id= '{id}' AND recipe_name='{recipe_name}';
     '''
     sql_cursor.execute(command)
     return sql_cursor.fetchone()
 
-
+#새로운 레시피 생성
 def new_recipe(id, dic):
     tmp_dict = dict(dic)
     if dup_check(id, tmp_dict['recipe_name']) == None:
@@ -159,10 +138,7 @@ def new_recipe(id, dic):
     else:
         return print('레시피명 중복')
 
-
-    
-
-
+#레시피 목록출력
 def my_recipes(id):
     command = f'''
     SELECT recipe_name FROM recipes WHERE id='{id}';
@@ -174,6 +150,7 @@ def my_recipes(id):
         result.append(recipe['recipe_name'])
     return result
 
+#레시피보기
 def show_detail_recipe(id, recipe_name):
     # list로 출력됨
     command = f'''
@@ -187,9 +164,9 @@ def show_detail_recipe(id, recipe_name):
             continue
         else:
             result[key] = value
-    
     return result
 
+#레시피삭제
 def delete_recipe(id, recipe_name):
     command = f'''
     DELETE FROM recipes WHERE id= '{id}' AND recipe_name='{recipe_name}';
@@ -197,3 +174,22 @@ def delete_recipe(id, recipe_name):
     sql_cursor.execute(command)
     mydb.commit()
     return print('삭제완료')
+
+
+############## 로컬 ################
+
+#노즐출력
+def nozzles(id):
+    command = f'''
+    SELECT * FROM nozzles WHERE id='{id}';
+    '''
+    sql_cursor.execute(command)
+    return list(dict(sql_cursor.fetchone()).values())[1:]       # [None, None, None, None, None, None, None, None]
+
+def nozzle_update(new_datas, id):
+    command = f'''
+    UPDATE nozzles SET {new_datas} WHERE id = '{id}';
+    '''
+    sql_cursor.execute(command)
+    mydb.commit()
+    return print('업데이트성공')

@@ -4,6 +4,8 @@ USE tmpdb;
 
 #조회
 SELECT * FROM users;
+SELECT * FROM nozzles;
+SELECT * FROM recipes;
 
 #DB삭제
 DROP DATABASE tmpdb;

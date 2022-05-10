@@ -12,6 +12,12 @@
 음료이름은 중복불가, 각 음료는 600이하, 모든 음료양의 합은 700이하, 행은 최대 8개
 <br>
 <br>
+<div id="existing_recipe" hidden>{% for recipe in recipes %}{{ recipe }},{% endfor %}</div>
+    
+    
+    
+
+
 <form method="post">
     <input type="hidden" id="row_count" value="1" disabled>  <!-- 행개수 -->
     <input type="text" id="recipe_name" name="recipe_name" placeholder="레시피이름">

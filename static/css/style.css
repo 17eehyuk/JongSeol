@@ -71,3 +71,7 @@ td{
     width: 100px;
     text-align: center;
 }
+
+input[type="number"]{
+    width: 162px;
+}

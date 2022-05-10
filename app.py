@@ -5,6 +5,7 @@ app = Flask(__name__)
 app.secret_key = "ssijfo@#!@#123"       # session을 사용하기 위해서는 반드시 있어야함
 app.jinja_env.filters['zip'] = zip      # jinja에서 zip 함수 사용하기 위함
 
+admin = {'user_id':'admin', 'user_pw' : 'a1234'}
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -59,7 +60,7 @@ def new_recipe():
         request.form
     except:
         pass
-    return render_template('./main/new_recipe.html', login_state=True, user_id=session['session_id'])
+    return render_template('./main/new_recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']))
 
 
 @app.route('/show_recipe/', methods=['POST'])
@@ -150,7 +151,6 @@ def admin():
 def login_process():
     user_id = request.form['user_id']
     user_pw = request.form['user_pw']
-
     # 로그인 실패 (실패시 '''로그인에 실패했습니다.''' 가 반환되므로 type('str') 이다.)
     if type(my_pysql.login(user_id, user_pw)) == type('str'):
         sql_message = my_pysql.login(user_id, user_pw)

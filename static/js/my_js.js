@@ -18,7 +18,7 @@ function transmit_id() {
     document.getElementById('user_id').value = val;    
 }
 
-//중복체크(레시지제작)
+//유효성검사(레시지제작)
 function valid_dect(){
     row_count = Number($('#row_count').val())   //현재 행의 개수
 
@@ -28,19 +28,32 @@ function valid_dect(){
 
     var drinks = [];
     var amount_sum = 0;
-    var drink_name = $('#drink_name').val();
+    var recipe_name = $('#recipe_name').val();
+
+
+     // 기존 레시피명 중복인지 판단
+     var existing_recipe = $('#existing_recipe').html().split(',')
+     existing_recipe.pop() //마지막 콤마 제거
+ 
+     for (var i=0; i<existing_recipe.length; i++){
+      if(recipe_name == existing_recipe[i]){
+        return alert(`레시피명 '${recipe_name}' 중복`)
+      }
+     }
 
     //id가져오기
     for(var i=0; i<row_count; i++){
       drink = $(`#drink${i}`).val();  //val : content 접근
       amount = $(`#drink${i}_amount`).val();
 
-      if(drink=='' || amount=='' || drink_name==''){return alert('데이터를 입력하세요')}
+      if(drink=='' || amount=='' || recipe_name==''){return alert('데이터를 입력하세요')}
       else{
         drinks[i] = drink
         amount_sum = amount_sum + Number(amount)
       }
-    }   
+    }
+    
+   
     
     var dup_drink
 
@@ -58,7 +71,7 @@ function valid_dect(){
     if(valid_flag==0){
       
       //.attr : 속성추가
-      $('#drink_name').attr("readonly",true)          //레시피이름 수정불가
+      $('#recipe_name').attr("readonly",true)          //레시피이름 수정불가
       $('input[type=text]').attr("readonly",true)     //글자 수정불가
       $('input[type=number]').attr("readonly",true)   //숫자 수정불가
       $('input[type=text]').css("background-color", "#D3D3D3")     //글자수정 색변경
@@ -78,11 +91,11 @@ function valid_dect(){
 
 function recipe_update(){
   row_count = Number($('#row_count').val())
-  $('#drink_name').attr("readonly",false)          //레시피이름 수정불가
+  $('#recipe_name').attr("readonly",false)          //레시피이름 수정불가
   $('input[type=text]').attr("readonly",false)
   $('input[type=number]').attr("readonly",false)
   $('input[type=text]').css("background-color", "#FFFFFF")     //글자수정색변경
-    $('input[type=number]').css("background-color", "#FFFFFF")   //숫자수정색변경
+  $('input[type=number]').css("background-color", "#FFFFFF")   //숫자수정색변경
 
   if(row_count>1){$('#pop_table_btn').attr("disabled",false)}
   if(row_count<8){$('#append_table_btn').attr("disabled",false)}
