@@ -2,7 +2,7 @@ import pymysql
 
 #MySQL 접속
 mydb = pymysql.connect(
-    user='tmp',
+    user='global',
     database='tmpdb',
     passwd='1234',
     host='localhost',
@@ -62,7 +62,7 @@ def drop_user(id):
 #개인정보확인
 def my_profile(id):
     command = f'''
-        SELECT sex, yb FROM USERS WHERE id='{id}';
+        SELECT sex, yb FROM users WHERE id='{id}';
     '''
     sql_cursor.execute(command)
     return sql_cursor.fetchone()
