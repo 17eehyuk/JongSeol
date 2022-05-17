@@ -65,6 +65,18 @@ def new_recipe():
 
 @app.route('/show_recipe/', methods=['POST'])
 def show_recipe():
+    recipe_name = request.form['recipe_name']
+    recipe_dict = my_pysql.show_detail_recipe(session['session_id'],recipe_name)
+    return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict)
+
+@app.route('/delete_recipe/', methods=['POST'])
+def delete_recipe():
+    # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
+    recipe_name = request.form['recipe_name']
+    return render_template('./main/delete_recipe.html', login_state=True, user_id=session['session_id'] ,recipe_name=recipe_name)
+
+@app.route('/update_recipe/', methods=['POST'])
+def update_recipe():
     # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
     recipe_name = request.form['recipe_name']
     tmp_recipe = list(my_pysql.show_detail_recipe(session['session_id'], recipe_name).values())        # 반드시 파이썬 3.7버전 이상 안그러면 dict의 순서 보장X 따라서 오류발생!!
@@ -73,16 +85,7 @@ def show_recipe():
     result_dict = {}
     for i in range(int(len(tmp_recipe)/2)):
         result_dict[tmp_recipe[2*i]] = tmp_recipe[2*i+1]
-
-    # {'id': 'cc', 'recipe_name': 'a', 'drink0': 'a', 'drink0_amount': '123'}
-    return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] ,recipe_name=recipe_name ,recipe = result_dict)
-
-
-@app.route('/delete_recipe/', methods=['POST'])
-def delete_recipe():
-    # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
-    recipe_name = request.form['recipe_name']
-    return render_template('./main/delete_recipe.html', login_state=True, user_id=session['session_id'] ,recipe_name=recipe_name)
+    return render_template('./main/update_recipe.html', login_state=True, user_id=session['session_id'] ,recipe_name=recipe_name,recipe = result_dict)
 
 
 ############################################################### main_processes ###############################################################
@@ -98,7 +101,7 @@ def managing_process():
 
 @app.route('/new_recipe_process/', methods=['POST'])
 def new_recipe_process():
-    my_pysql.new_recipe(session['session_id'], request.form)
+    my_pysql.new_recipe(request.form)
     return redirect('/recipe/')
 
 @app.route('/delete_recipe_process/', methods=['POST'])
@@ -151,10 +154,10 @@ def admin():
 def login_process():
     user_id = request.form['user_id']
     user_pw = request.form['user_pw']
+    sql_result = my_pysql.login(user_id, user_pw)
     # 로그인 실패 (실패시 '''로그인에 실패했습니다.''' 가 반환되므로 type('str') 이다.)
-    if type(my_pysql.login(user_id, user_pw)) == type('str'):
-        sql_message = my_pysql.login(user_id, user_pw)
-        return render_template('frame.html', message_state = True, frame_message = sql_message)
+    if type(sql_result) == type('str'):
+        return render_template('frame.html', message_state = True, frame_message = sql_result)
     # 로그인 성공
     else:
         session['session_id'] = user_id    # 세션에 현재 아이디 입력

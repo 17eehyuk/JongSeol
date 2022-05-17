@@ -1,0 +1,37 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    레시피보기
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+{% set count = namespace(value=0) %}
+
+<form method="post">
+<h2>{{ recipe_name }}</h2>
+<input type="hidden" name="recipe_name" value="{{ recipe_name }}">
+
+<table border="1px">
+    <tr>
+        <th>음료명</th>
+        <th>음료양</th>
+    </tr>
+    {% for key, value in recipe.items() %}
+    <tr>
+        <td>{{key}}<input type="hidden" value="{{key}}" name="drink{{count.value}}"></td>        
+        <td><input type="number" value="{{value}}" name="drink{{count.value}}_amount" id="drink{{count.value}}_amount" placeholder="{{ count.value }}번음료양(0~600)" oninput="num_only(this); NO_over_600(this)"></td>
+    </tr>
+    {% set count.value = count.value + 1 %}
+    {% endfor %}    
+</table>
+<input type="button" id="update_dect_btn" onclick="update_dect()" value="유효성검사">
+<input type="button" id="modify_btn" value="수정하기" onclick="update_modify()" disabled>
+<input type="submit" id="update_btn" formaction="/ㄴㄴ/" value="저장하기" disabled>
+</form>
+<input type="hidden" id="row_count" value="{{count.value}}" disabled>  <!-- 행개수 -->
+
+
+{% endblock %}

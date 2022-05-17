@@ -10,13 +10,13 @@ function NO_over_600(only_this){
 }
 
 
-//아이디전송(관리자)
-function transmit_id() {    
-    var sel = document.getElementById('copy_id');
-    var val = sel.options[sel.selectedIndex].value
-    console.log(val)
-    document.getElementById('user_id').value = val;    
-}
+// //아이디전송(관리자)
+// function transmit_id() {    
+//     var sel = document.getElementById('copy_id');
+//     var val = sel.options[sel.selectedIndex].value
+//     console.log(val)
+//     document.getElementById('user_id').value = val;    
+// }
 
 //유효성검사(레시지제작)
 function valid_dect(){
@@ -31,15 +31,16 @@ function valid_dect(){
     var recipe_name = $('#recipe_name').val();
 
 
-     // 기존 레시피명 중복인지 판단
-     var existing_recipe = $('#existing_recipe').html().split(',')
-     existing_recipe.pop() //마지막 콤마 제거
- 
-     for (var i=0; i<existing_recipe.length; i++){
+    // 기존 레시피명 중복인지 판단
+    var existing_recipe = $('#existing_recipe').html().split(',')
+    existing_recipe.pop() //마지막 콤마 제거
+    
+
+    for (var i=0; i<existing_recipe.length; i++){
       if(recipe_name == existing_recipe[i]){
         return alert(`레시피명 '${recipe_name}' 중복`)
       }
-     }
+    }
 
     //id가져오기
     for(var i=0; i<row_count; i++){
@@ -129,4 +130,38 @@ function pop_table(){
   $(`#row${row_count-1}`).remove();
   if(row_count-1==1){$('#pop_table_btn').attr("disabled", true)};
   $('#row_count').val(row_count-1);  
+}
+
+
+function update_dect(){
+  row_count = Number($('#row_count').val())   //현재 행의 개수
+  amount_sum = 0
+  sum_flag=0
+  for(var i=0; i<row_count; i++){
+    amount = $(`#drink${i}_amount`).val();
+
+    if(amount==''){return alert('데이터를 입력하세요')}
+    else{
+      amount_sum = amount_sum + Number(amount)
+    }
+  }
+  if(amount_sum>=0 && amount_sum<=700){sum_flag=0} //문제없음
+  else{sum_flag=1}  //문제있음
+
+  if(sum_flag==0){
+    $('#update_dect_btn').attr("disabled",true)         
+    $('#modify_btn').attr("disabled",false)          
+    $('#update_btn').attr("disabled",false)
+    $('input[type=number]').attr("readonly",true)          
+  }
+  else{
+    if(amount_sum>700){return alert(`700초과\n현재값 : ${amount_sum}`)}
+  }
+}
+
+function update_modify(){
+  $('#update_dect_btn').attr("disabled",false)          
+  $('#modify_btn').attr("disabled",true)          
+  $('#update_btn').attr("disabled",true)        
+  $('input[type=number]').attr("readonly",false)
 }

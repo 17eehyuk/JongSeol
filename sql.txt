@@ -1,6 +1,6 @@
 cd C:\Program Files\mysql-8.0.28-winx64\bin
 mysql -utmp -p1234
-USE tmpdb;
+
 
 #조회
 SELECT * FROM users;
@@ -10,11 +10,13 @@ SELECT * FROM recipes;
 #DB삭제
 DROP DATABASE tmpdb;
 
+#Table 삭제
+DROP TABLE users;
+
 #DB생성(UTF8)
 CREATE DATABASE tmpdb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-#Table 삭제
-DROP TABLE users;
+USE tmpdb;
 
 #users
 CREATE TABLE users(
@@ -37,9 +39,31 @@ nozzle6 VARCHAR(10),
 nozzle7 VARCHAR(10)
 );
 
+
+
+#recipes(간략화)
+CREATE TABLE recipes(
+id VARCHAR(10),
+author VARCHAR(10),
+recipe_name VARCHAR(10),
+drink0 VARCHAR(10),
+drink0_amount CHAR(3),
+drink1 VARCHAR(10),
+drink1_amount CHAR(3),
+drink2 VARCHAR(10),
+drink2_amount CHAR(3),
+drink3 VARCHAR(10),
+drink3_amount CHAR(3)
+);
+
+
+
+
+
 #recipes
 CREATE TABLE recipes(
 id VARCHAR(10),
+author VARCHAR(10),
 recipe_name VARCHAR(10),
 drink0 VARCHAR(10),
 drink0_amount CHAR(3),

@@ -109,34 +109,24 @@ def pw_clear(id):
     mydb.commit()
     return print('비밀번호 초기화 성공(1234)')
 
-#레시피명 중복인지 확인 (return 값이 None이면 중복 없음, 아닌경우 중복존재)
-def dup_check(id, recipe_name):
-    command = f'''
-    SELECT * FROM recipes WHERE id= '{id}' AND recipe_name='{recipe_name}';
-    '''
-    sql_cursor.execute(command)
-    return sql_cursor.fetchone()
 
 #새로운 레시피 생성
-def new_recipe(id, dic):
+def new_recipe(dic):
     tmp_dict = dict(dic)
-    if dup_check(id, tmp_dict['recipe_name']) == None:
-        keys ='id,'
-        values = f''''{id}','''
-        for key, value in tmp_dict.items():
-            keys = keys + key + ','
-            values = values + "'" + value + "'" + ","
-        keys = keys[:-1]
-        values = values[:-1] 
+    keys =''
+    values = ''
+    for key, value in tmp_dict.items():
+        keys = keys + key + ','
+        values = values + "'" + value + "'" + ","
+    keys = keys[:-1]
+    values = values[:-1] 
 
-        command = f'''
-        INSERT INTO recipes ({keys}) values  ({values});
-        '''
-        sql_cursor.execute(command)
-        mydb.commit()
-        return print('레시피 추가 성공')
-    else:
-        return print('레시피명 중복')
+    command = f'''
+    INSERT INTO recipes ({keys}) values  ({values});
+    '''
+    sql_cursor.execute(command)
+    mydb.commit()
+    return print('레시피 추가 성공')
 
 #레시피 목록출력
 def my_recipes(id):
@@ -145,14 +135,19 @@ def my_recipes(id):
     '''
     sql_cursor.execute(command)
     recipes =  sql_cursor.fetchall()
+    print(recipes)
     result = []
-    for recipe in recipes:        
-        result.append(recipe['recipe_name'])
+    for recipe in recipes:
+        tmp_dict = dict(recipe)     
+        tmp_list = list(tmp_dict.values())      # ['아메리카노', 'A']
+        recipe_name = tmp_list[0]
+        result.append(recipe_name)
     return result
+
 
 #레시피보기
 def show_detail_recipe(id, recipe_name):
-    # list로 출력됨
+    # {'id': 'A', 'author': 'A', 'recipe_name': '물', 'drink0': '물', 'drink0_amount': '200'}
     command = f'''
     SELECT * FROM recipes WHERE id= '{id}' AND recipe_name='{recipe_name}';
     '''
