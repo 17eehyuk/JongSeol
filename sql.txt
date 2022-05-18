@@ -1,5 +1,6 @@
 cd C:\Program Files\mysql-8.0.28-winx64\bin
 mysql -utmp -p1234
+python ./my_modules/my_pysql.py
 
 
 #조회
@@ -25,21 +26,6 @@ pw VARCHAR(50) NOT NULL,
 sex CHAR(1) NOT NULL,
 yb CHAR(4) NOT NULL 
 );
-
-#nozzles
-CREATE TABLE nozzles(
-id VARCHAR(10) UNIQUE NOT NULL ,
-nozzle0 VARCHAR(10),
-nozzle1 VARCHAR(10),
-nozzle2 VARCHAR(10),
-nozzle3 VARCHAR(10),
-nozzle4 VARCHAR(10),
-nozzle5 VARCHAR(10),
-nozzle6 VARCHAR(10),
-nozzle7 VARCHAR(10)
-);
-
-
 
 #recipes(간략화)
 CREATE TABLE recipes(
@@ -83,3 +69,19 @@ drink7 VARCHAR(10),
 drink7_amount CHAR(3)
 );
 
+
+
+
+
+#nozzles
+CREATE TABLE nozzles(
+id VARCHAR(10) UNIQUE NOT NULL ,
+nozzle0 VARCHAR(10),
+nozzle1 VARCHAR(10),
+nozzle2 VARCHAR(10),
+nozzle3 VARCHAR(10),
+nozzle4 VARCHAR(10),
+nozzle5 VARCHAR(10),
+nozzle6 VARCHAR(10),
+nozzle7 VARCHAR(10)
+);

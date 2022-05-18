@@ -25,19 +25,14 @@ def login(id, pw):
         return result        # 데이터가 있으며 {'userid': 'A', 'userpw': '1234'}, 없으면 None 이 return됨
 #회원가입
 def register(id, pw, sex, yb):
+    if id=='admin':
+        return '''admin은 사용불가능 합니다.'''
     command = f'''
     INSERT INTO users VALUES ('{id}', password('{pw}'), '{sex}', '{yb}');
     '''
     try:
         sql_cursor.execute(command)         # 중복인 경우 에러 발생하므로 try/except 사용
         mydb.commit()
-        #노즐 정보를 만들어줌
-        if(id=='admin'):
-            command = f'''
-            INSERT INTO nozzles VALUES('{id}' ,'', '', '', '', '', '', '', '');
-            '''
-            sql_cursor.execute(command)
-            mydb.commit()
         return f'''{id}님 회원가입을 축하드립니다.'''
     except:
         return f'''아이디 : '{id}' 중복입니다. 다른 아이디를 사용해 주세요'''
@@ -135,7 +130,6 @@ def my_recipes(id):
     '''
     sql_cursor.execute(command)
     recipes =  sql_cursor.fetchall()
-    print(recipes)
     result = []
     for recipe in recipes:
         tmp_dict = dict(recipe)     
@@ -171,15 +165,28 @@ def delete_recipe(id, recipe_name):
     return print('삭제완료')
 
 
-############## 로컬 ################
-
-#노즐출력
-def nozzles(id):
+def update_recipe(id, cmd, recipe_name):
     command = f'''
-    SELECT * FROM nozzles WHERE id='{id}';
+    UPDATE recipes SET {cmd} WHERE id= '{id}' AND recipe_name='{recipe_name}';
     '''
     sql_cursor.execute(command)
-    return list(dict(sql_cursor.fetchone()).values())[1:]       # [None, None, None, None, None, None, None, None]
+    mydb.commit()
+    return print('수정완료')
+    #update recipes set drink0_amount=150, drink1_amount=150 WHERE id='A' AND recipe_name='아메리카노';
+
+
+
+
+
+############## 로컬 ################
+
+# #노즐출력
+# def nozzles(id):
+#     command = f'''
+#     SELECT * FROM nozzles WHERE id='{id}';
+#     '''
+#     sql_cursor.execute(command)
+#     return list(dict(sql_cursor.fetchone()).values())[1:]       # [None, None, None, None, None, None, None, None]
 
 def nozzle_update(new_datas, id):
     command = f'''

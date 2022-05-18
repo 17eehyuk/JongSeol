@@ -75,6 +75,7 @@ function valid_dect(){
       $('#recipe_name').attr("readonly",true)          //레시피이름 수정불가
       $('input[type=text]').attr("readonly",true)     //글자 수정불가
       $('input[type=number]').attr("readonly",true)   //숫자 수정불가
+      $('#recipe_name').css("background-color", "#D3D3D3")     //레시피제목 색변경
       $('input[type=text]').css("background-color", "#D3D3D3")     //글자수정 색변경
       $('input[type=number]').css("background-color", "#D3D3D3")   //숫자수정 색변경
 
@@ -82,7 +83,7 @@ function valid_dect(){
       $('#pop_table_btn').attr("disabled",true)       //행삭제 불가
       $('#valid_dect_btn').attr("disabled",true)      //유효성검사 불가
       $('#recipe_update_btn').attr("disabled",false)  //업데이트 가능
-      $('input[type=submit]').attr("disabled",false)  //제출 가능
+      $('#save_btn').attr("disabled",false)  //제출 가능
     }
     else{
       if(dup_flag==1){return alert(`음료 '${dup_drink}' 중복`)}
@@ -102,7 +103,7 @@ function recipe_update(){
   if(row_count<8){$('#append_table_btn').attr("disabled",false)}
   $('#valid_dect_btn').attr("disabled",false)
   $('#recipe_update_btn').attr("disabled",true)
-  $('input[type=submit]').attr("disabled",true)
+  $('#save_btn').attr("disabled",true)
 
 }
 
@@ -152,7 +153,8 @@ function update_dect(){
     $('#update_dect_btn').attr("disabled",true)         
     $('#modify_btn').attr("disabled",false)          
     $('#update_btn').attr("disabled",false)
-    $('input[type=number]').attr("readonly",true)          
+    $('input[type=number]').attr("readonly",true)
+    $('input[type=number]').css("background-color", "#D3D3D3")   //숫자수정 색변경       
   }
   else{
     if(amount_sum>700){return alert(`700초과\n현재값 : ${amount_sum}`)}
@@ -164,4 +166,5 @@ function update_modify(){
   $('#modify_btn').attr("disabled",true)          
   $('#update_btn').attr("disabled",true)        
   $('input[type=number]').attr("readonly",false)
+  $('input[type=number]').css("background-color", "#FFFFFF")   //숫자수정색변경
 }

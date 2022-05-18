@@ -2,36 +2,54 @@
 
 <!--제목-->
 {% block title %}
-    레시피보기
+    레시피수정
 {% endblock %}
 
 <!--내용-->
 {% block content %}
 
-{% set count = namespace(value=0) %}
 
+{% set leng = (((recipe_dict|length)-3)/2)|int %}  {# -3: id,author,recipe_name #}           {# /2: drink,drink_amount #}
+
+<h2>{{ recipe_dict['recipe_name'] }} (작성자 : {{ recipe_dict['author'] }})</h2>
+<br>
 <form method="post">
-<h2>{{ recipe_name }}</h2>
-<input type="hidden" name="recipe_name" value="{{ recipe_name }}">
+<input type="hidden" name="recipe_name" value="{{ recipe_dict['recipe_name'] }}">
 
 <table border="1px">
     <tr>
         <th>음료명</th>
         <th>음료양</th>
     </tr>
-    {% for key, value in recipe.items() %}
-    <tr>
-        <td>{{key}}<input type="hidden" value="{{key}}" name="drink{{count.value}}"></td>        
-        <td><input type="number" value="{{value}}" name="drink{{count.value}}_amount" id="drink{{count.value}}_amount" placeholder="{{ count.value }}번음료양(0~600)" oninput="num_only(this); NO_over_600(this)"></td>
-    </tr>
-    {% set count.value = count.value + 1 %}
-    {% endfor %}    
-</table>
+    
+    {% for i in range(leng) %}
+        {% set drink = 'drink'+(i|string) %}
+        {% set drink_amount = drink+'_amount' %}
+        <tr>
+            <td>{{recipe_dict[drink]}}</td>
+            <input type="hidden" name="drink{{i}}" value="{{recipe_dict[drink]}}">
+            <td><input type="number" id="drink{{i}}_amount" name="drink{{i}}_amount" value="{{recipe_dict[drink_amount]}}" placeholder="{{i}}번음료" oninput="num_only(this); NO_over_600(this)"></td>
+        </tr>
+        {% endfor %}  
+
+    {#
+        {% for i in range(leng) %}
+        {% set drink = 'drink'+(i|string) %}
+        {% set drink_amount = 'drink'+(i|string)+'_amount' %}
+            {{drink}}
+            {{drink_amount}}
+        {% endfor %} 
+    #}
+        
+</table>   
+
+
+
 <input type="button" id="update_dect_btn" onclick="update_dect()" value="유효성검사">
 <input type="button" id="modify_btn" value="수정하기" onclick="update_modify()" disabled>
-<input type="submit" id="update_btn" formaction="/ㄴㄴ/" value="저장하기" disabled>
+<input type="submit" id="update_btn" formaction="/update_recipe_process/" value="저장하기" disabled>
 </form>
-<input type="hidden" id="row_count" value="{{count.value}}" disabled>  <!-- 행개수 -->
+<input type="hidden" id="row_count" value="{{leng}}" disabled>
 
 
 {% endblock %}

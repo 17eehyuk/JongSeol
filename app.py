@@ -1,11 +1,17 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from my_modules import my_pysql, my_wtforms
+import json
 
 app = Flask(__name__)
 app.secret_key = "ssijfo@#!@#123"       # session을 사용하기 위해서는 반드시 있어야함
-app.jinja_env.filters['zip'] = zip      # jinja에서 zip 함수 사용하기 위함
 
-admin = {'user_id':'admin', 'user_pw' : 'a1234'}
+
+def local():
+    path = "./local.json"
+    with open(path, 'r', encoding='utf-8') as json_file:
+        return json.load(json_file)
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -25,11 +31,11 @@ def managing():
     if request.method == 'GET':
         if 'session_id' in session:
             my_profile = my_pysql.my_profile(session['session_id'])
-            return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzles('admin'), nozzle_update=0, my_profile=my_profile)
+            return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=local(), nozzle_update=0, my_profile=my_profile)
         else:
             return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
     elif request.method == 'POST':
-       return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=my_pysql.nozzles('admin'), nozzle_update=1)
+       return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=local(), nozzle_update=1)
 
 @app.route('/making/', methods=['GET', 'POST'])
 def making():
@@ -43,8 +49,13 @@ def making():
 
 
 
-@app.route('/recipe/')
+@app.route('/recipe/', methods=['GET', 'POST'])
 def recipe():
+    # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
+    try:
+        request.form
+    except:
+        pass
     if 'session_id' in session:
             return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']))
     else:
@@ -77,26 +88,23 @@ def delete_recipe():
 
 @app.route('/update_recipe/', methods=['POST'])
 def update_recipe():
-    # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
-    recipe_name = request.form['recipe_name']
-    tmp_recipe = list(my_pysql.show_detail_recipe(session['session_id'], recipe_name).values())        # 반드시 파이썬 3.7버전 이상 안그러면 dict의 순서 보장X 따라서 오류발생!!
-    recipe_name = tmp_recipe[1]
-    tmp_recipe = tmp_recipe[2:]
-    result_dict = {}
-    for i in range(int(len(tmp_recipe)/2)):
-        result_dict[tmp_recipe[2*i]] = tmp_recipe[2*i+1]
-    return render_template('./main/update_recipe.html', login_state=True, user_id=session['session_id'] ,recipe_name=recipe_name,recipe = result_dict)
+    recipe_name = request.form['recipe_name']    
+    recipe_dict = my_pysql.show_detail_recipe(session['session_id'],recipe_name)
+    print(recipe_name)
+    print(recipe_dict)
 
+    return render_template('./main/update_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict)
 
 ############################################################### main_processes ###############################################################
 @app.route('/managing_process/', methods=['POST'])
 def managing_process():
-    new_datas = ''
-    for key, value in dict(request.form).items():
-        new_datas = new_datas + f'''{key}='{value}','''
-    # 마지막 콤마(,) 제거
-    new_datas = new_datas[:-1]                              # nozzle0='우유',nozzle1='',nozzle2='커피',nozzle3='',nozzle4='',nozzle5='',nozzle6='',nozzle7=''
-    my_pysql.nozzle_update(new_datas, session['session_id'])
+    new_nozzles = dict(request.form)
+    old_nozzles = local()
+    for i in range(len(new_nozzles)):
+        nozzle = 'nozzle'+str(i)
+        old_nozzles[nozzle] = new_nozzles[nozzle]       # json 데이터 수정
+    with open('./local.json', 'w', encoding='utf-8') as update:
+        json.dump(old_nozzles, update)      # 수정된 데이터 저장하기
     return redirect('/managing/')
 
 @app.route('/new_recipe_process/', methods=['POST'])
@@ -111,7 +119,23 @@ def delete_recipe_process():
 
 
 
+@app.route('/update_recipe_process/', methods=['POST'])
+def update_recipe_process():
+    # {'recipe_name': '아메리카노', 'drink0': '물', 'drink0_amount': '200', 'drink1': '에스프레소', 'drink1_amount': '25'}
+    req_dict= dict(request.form)
+    recipe_name = req_dict['recipe_name']
+    amounts = int((len(req_dict)-1)/2)
+    cmd = ''
 
+    for i in range(amounts):
+        drink_amount = 'drink' + str(i) +'_amount'
+        drink_amount_num = req_dict[drink_amount]
+        cmd = cmd + f'''{drink_amount}={drink_amount_num}, '''
+
+    cmd = cmd[:-2]
+    my_pysql.update_recipe(session['session_id'], cmd, recipe_name)
+
+    return redirect('/recipe/')
 
 
 ############################################################### login ###############################################################  
@@ -154,14 +178,23 @@ def admin():
 def login_process():
     user_id = request.form['user_id']
     user_pw = request.form['user_pw']
-    sql_result = my_pysql.login(user_id, user_pw)
-    # 로그인 실패 (실패시 '''로그인에 실패했습니다.''' 가 반환되므로 type('str') 이다.)
-    if type(sql_result) == type('str'):
-        return render_template('frame.html', message_state = True, frame_message = sql_result)
-    # 로그인 성공
-    else:
-        session['session_id'] = user_id    # 세션에 현재 아이디 입력
-        return redirect('/')
+    if user_id != 'admin':
+        sql_result = my_pysql.login(user_id, user_pw)
+        # 로그인 실패 (실패시 '''로그인에 실패했습니다.''' 가 반환되므로 type('str') 이다.)
+        if type(sql_result) == type('str'):
+            return render_template('frame.html', message_state = True, frame_message = sql_result)
+        # 로그인 성공
+        else:
+            session['session_id'] = user_id    # 세션에 현재 아이디 입력
+            return redirect('/')
+    elif user_id == 'admin':
+        if user_pw == local()['admin_pw']:
+            session['session_id'] = user_id    # 성공
+            return redirect('/')
+        else:
+            return render_template('frame.html', message_state = True, frame_message = '로그인에 실패했습니다.')
+
+    
 
 @app.route('/register_process/', methods=['POST'])
 def register_process():
