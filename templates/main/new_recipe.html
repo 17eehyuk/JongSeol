@@ -9,7 +9,8 @@
 {% block content %}
 
 <h2>새 레시피</h2>
-레시피명, 음료이름(재료) 중복불가, 각 음료는 600이하, 모든 음료양의 합은 700이하, 행은 최대 8개
+레시피명, 음료이름(재료) 중복불가, 각 음료는 600이하, 모든 음료양의 합은 700이하, 행은 최대 8개<br>
+레시피명은 영어, 한글, 숫자만 가능, 음료이름(재료)는 한글만 가능
 <br>
 <br>
 <div id="existing_recipe" hidden>{% for recipe in recipes %}{{ recipe }},{% endfor %}</div>
@@ -31,7 +32,7 @@
             </tr>
             <tr id="row0">
                 <td><input type="text" name="drink0" id="drink0" placeholder="0번음료"></td>
-                <td><input type="number" name="drink0_amount" id="drink0_amount" placeholder="0번음료양(0~600)" oninput="num_only(this); NO_over_600(this)"></td>
+                <td><input type="number" name="drink0_amount" id="drink0_amount" placeholder="0번음료양(0~600)" oninput="num_only(this); NO_over_600(this);"></td>
             </tr>
         </tbody>
     </table>

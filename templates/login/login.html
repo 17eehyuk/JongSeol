@@ -13,12 +13,12 @@
 <form method="post">
     <table>
         <tr>
-            <th width="50px">{{ form.user_id.label }}</th>
-            <td>{{ form.user_id }}</td>
+            <th width="50px">ID</th>
+            <td><input id="user_id" maxlength="10" name="user_id" required="" type="text" value="" placeholder="아이디"></td>
         </tr>
         <tr>
-            <th>{{ form.user_pw.label }}</th>
-            <td>{{ form.user_pw }}</td>
+            <th>PW</th>
+            <td><input id="user_pw" maxlength="10" name="user_pw" required="" type="password" value="" placeholder="비밀번호"></td>
         </tr>
     </table>
     <br>

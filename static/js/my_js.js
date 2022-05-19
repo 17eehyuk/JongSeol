@@ -9,14 +9,29 @@ function NO_over_600(only_this){
   }
 }
 
+function NO_kid(only_this){
+  var adult_year = new Date().getFullYear() - 18;
+  if(only_this.value>adult_year){
+    only_this.value=adult_year;
+  }
+}
+function NO_spc(str){
+  const regex = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9|]+$/;
+  return regex.test(str)    // 한글, 영어, 숫자는 true 그외는 false
+}
 
-// //아이디전송(관리자)
-// function transmit_id() {    
-//     var sel = document.getElementById('copy_id');
-//     var val = sel.options[sel.selectedIndex].value
-//     console.log(val)
-//     document.getElementById('user_id').value = val;    
-// }
+function ONLY_hangul(str){
+  const regex = /^[ㄱ-ㅎ|가-힣]+$/;
+  return regex.test(str)    // 한글은 true 그외는 false
+}
+
+//아이디전송(관리자)
+function transmit_id() {    
+    var sel = document.getElementById('copy_id');
+    var val = sel.options[sel.selectedIndex].value
+    console.log(val)
+    document.getElementById('user_id').value = val;    
+}
 
 //유효성검사(레시지제작)
 function valid_dect(){
@@ -46,14 +61,16 @@ function valid_dect(){
     for(var i=0; i<row_count; i++){
       drink = $(`#drink${i}`).val();  //val : content 접근
       amount = $(`#drink${i}_amount`).val();
-
       if(drink=='' || amount=='' || recipe_name==''){return alert('데이터를 입력하세요')}
       else{
         drinks[i] = drink
         amount_sum = amount_sum + Number(amount)
       }
+      if (ONLY_hangul(drink)==false){return alert('음료이름(재료)는 한글만 가능')}
     }
-    
+    if(NO_spc(recipe_name) == false){
+      return alert(`한글, 영어, 숫자만 입력가능`)
+    }
    
     
     var dup_drink
@@ -141,6 +158,34 @@ function update_dect(){
   for(var i=0; i<row_count; i++){
     amount = $(`#drink${i}_amount`).val();
 
+
+  // 기존 레시피명 중복인지 판단
+  var existing_recipe = $('#existing_recipe').html().split(',')
+  existing_recipe.pop() //마지막 콤마 제거
+  var old_recipe_name = $('#old_recipe_name').val();
+  var new_recipe_name = $('#new_recipe_name').val();
+  
+  if(NO_spc(new_recipe_name) == false){
+    return alert(`한글, 영어, 숫자만 입력가능`)
+  }
+
+
+  for (var i=0; i<existing_recipe.length; i++){
+
+    // 수정안한경우는 상관없음
+    if(new_recipe_name==old_recipe_name){
+      continue;
+    }
+
+    if(new_recipe_name == existing_recipe[i]){
+      return alert(`레시피명 '${new_recipe_name}' 중복`)
+    }
+  }
+
+
+
+
+
     if(amount==''){return alert('데이터를 입력하세요')}
     else{
       amount_sum = amount_sum + Number(amount)
@@ -153,6 +198,8 @@ function update_dect(){
     $('#update_dect_btn').attr("disabled",true)         
     $('#modify_btn').attr("disabled",false)          
     $('#update_btn').attr("disabled",false)
+    $('#new_recipe_name').attr("readonly",true)
+    $('#new_recipe_name').css("background-color", "#D3D3D3")   //숫자수정 색변경 
     $('input[type=number]').attr("readonly",true)
     $('input[type=number]').css("background-color", "#D3D3D3")   //숫자수정 색변경       
   }
@@ -164,7 +211,9 @@ function update_dect(){
 function update_modify(){
   $('#update_dect_btn').attr("disabled",false)          
   $('#modify_btn').attr("disabled",true)          
-  $('#update_btn').attr("disabled",true)        
+  $('#update_btn').attr("disabled",true)
+  $('#new_recipe_name').attr("readonly",false)
+  $('#new_recipe_name').css("background-color", "#FFFFFF")   //숫자수정 색변경      
   $('input[type=number]').attr("readonly",false)
   $('input[type=number]').css("background-color", "#FFFFFF")   //숫자수정색변경
 }

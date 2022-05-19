@@ -29,7 +29,7 @@
                 <input checked="" id="user_sex-1" name="user_sex" type="radio" value="F">여자</label>
                 {% endif %}
             </td>
-            <td><input id="user_yb" max="2004" min="1900" name="user_yb" required="" type="number" value="{{old_profile['yb']}}"></td>
+            <td><input id="user_yb" max="2004" min="1900" name="user_yb" required="" type="number" value="{{old_profile['yb']}}" oninput="num_only(this); NO_kid(this);"></td>
             <td><input id="user_pw" maxlength="10" name="user_pw" type="password" value=""></td>         
         </tr>
     </table>

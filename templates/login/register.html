@@ -13,20 +13,29 @@
 <form id="register" method="post">
     <table>
         <tr>
-            <th width="100">{{ form.user_id.label }}</th>
-            <td>{{ form.user_id }}</td>
+            <th width="100">ID</th>
+            <td><input maxlength="10" name="user_id" type="text" value="" placeholder="아이디" required></td>
         </tr>
         <tr>
-            <th>{{ form.user_pw.label }}</th>
-            <td>{{ form.user_pw }}</td>
+            <th>PW</th>
+            <td><input maxlength="10" name="user_pw" type="password" value="" placeholder="비밀번호" required></td>
         </tr>
         <tr>
-            <th>{{ form.user_sex.label }}</th>
-            <td>{{ form.user_sex }}</td>
+            <th width="100">성별</th>
+            <td>
+                <ul id="user_sex">
+                    <li><input checked="" id="man" name="user_sex" type="radio" value="M">
+                        <label for="man">남자</label>
+                    </li>
+                    <li><input id="woman" name="user_sex" type="radio" value="F">
+                        <label for="woman">여자</label>
+                    </li>
+                </ul>
+            </td>
         </tr>
         <tr>
-            <th>{{ form.user_yb.label }}</th>
-            <td>{{ form.user_yb }}</td>
+            <th width="100">태어난해</th>
+            <td><input id="user_yb" max="2004" min="1900" name="user_yb" required="" type="number" value="2004" oninput="num_only(this); NO_kid(this);"></td>
         </tr>
     </table>
     <br>

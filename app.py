@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, url_for
-from my_modules import my_pysql, my_wtforms
+from my_modules import my_pysql
 import json
+import serial
 
 app = Flask(__name__)
 app.secret_key = "ssijfo@#!@#123"       # session을 사용하기 위해서는 반드시 있어야함
@@ -11,6 +12,39 @@ def local():
     with open(path, 'r', encoding='utf-8') as json_file:
         return json.load(json_file)
 
+def len3(string):
+    if len(string) == 1:
+        string = '00'+string
+    elif len(string) == 2:
+        string = '0'+string
+    return string
+
+def len32(string):
+    return str(string) + ''.join(list('!' for i in range(32-len(string))))
+
+def my_serial(cmd):
+    py_serial = serial.Serial(
+        port='COM4',    #본인에게 맞는 포트 설정해주기
+        baudrate=9600,
+    )
+    serial_flag = 0
+    rx_result = ''
+
+    while True:
+        if py_serial.readable():
+            rx = py_serial.readline()[:-1].decode()
+            print(rx)
+            rx_result = rx_result + rx + '\n'
+
+        # 명령어 전송
+        if serial_flag==0 :
+            tx = len32(cmd)
+            py_serial.write(tx.encode())
+            serial_flag = 1
+
+        if rx[0:9] == 'Complete!':
+            break
+    return rx_result
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -33,7 +67,7 @@ def managing():
             my_profile = my_pysql.my_profile(session['session_id'])
             return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=local(), nozzle_update=0, my_profile=my_profile)
         else:
-            return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
+            return render_template('./login/login.html', login_state = False)
     elif request.method == 'POST':
        return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=local(), nozzle_update=1)
 
@@ -43,7 +77,7 @@ def making():
         if 'session_id' in session:
             return render_template('./main/making.html', login_state=True, user_id=session['session_id'])
         else:
-            return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
+            return render_template('./login/login.html', login_state = False)
     elif request.method == 'POST':
        return render_template('./main/making.html', login_state=True, user_id=session['session_id'])
 
@@ -57,9 +91,9 @@ def recipe():
     except:
         pass
     if 'session_id' in session:
-            return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']))
+            return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']), html_message=0)
     else:
-        return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
+        return render_template('./login/login.html', login_state = False)
         
 
 
@@ -90,10 +124,41 @@ def delete_recipe():
 def update_recipe():
     recipe_name = request.form['recipe_name']    
     recipe_dict = my_pysql.show_detail_recipe(session['session_id'],recipe_name)
-    print(recipe_name)
-    print(recipe_dict)
+    return render_template('./main/update_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict, recipes=my_pysql.my_recipes(session['session_id']))
 
-    return render_template('./main/update_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict)
+@app.route('/make_recipe/', methods=['POST'])
+def make_recipe():
+    recipe_dict = dict(request.form)                # {'recipe_name': '아메리카노', 'drink0': '물', 'drink0_amount': '200', 'drink1': '에스프레소', 'drink1_amount': '25'}
+    recipe_name = recipe_dict['recipe_name']        # 아메리카노
+    recipe_len = int((len(recipe_dict)-1)/2)        # 2 (레시피 길이 추출)
+    nozzles=local()                                 # {'admin_id': 'admin', 'admin_pw': '1251', 'nozzle0': '', 'nozzle1': '', 'nozzle2': '', 'nozzle3': '우유', 'nozzle4': '', 'nozzle5': '', 'nozzle6': '물', 'nozzle7': '에스프레소'}
+                             
+    cmd = ''
+    err = ''
+
+    for i in range(recipe_len):
+        no_nozzle = 1
+        drink = recipe_dict['drink'+str(i)]
+        for j in range(8):
+            nozzle = nozzles['nozzle'+str(j)]
+            if drink==nozzle:
+                cmd = cmd + str(j) + len3(recipe_dict['drink'+str(i)+'_amount'])
+                no_nozzle = 0
+                break
+        if no_nozzle == 1:
+            err = err + f'''{drink} 노즐없음, '''
+    
+    alert = ''
+    print(err[:-2])
+    if err=='':     # 에러가 없는 경우
+        alert = f'''{recipe_name} 제작완료'''
+        serial_result = my_serial(cmd)      # 나중에 보고서 쓸때 주석해놓기
+    else:
+        alert = err[:-2]
+        serial_result = ''
+    return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']),html_message=1,recipe_name=recipe_name, html_alert=alert, serial_result=serial_result) 
+
+
 
 ############################################################### main_processes ###############################################################
 @app.route('/managing_process/', methods=['POST'])
@@ -125,12 +190,13 @@ def update_recipe_process():
     req_dict= dict(request.form)
     recipe_name = req_dict['recipe_name']
     amounts = int((len(req_dict)-1)/2)
-    cmd = ''
-
+    new_recipe_name = req_dict['new_recipe_name']
+    print(new_recipe_name)
+    cmd = f'''recipe_name='{new_recipe_name}', '''
     for i in range(amounts):
         drink_amount = 'drink' + str(i) +'_amount'
         drink_amount_num = req_dict[drink_amount]
-        cmd = cmd + f'''{drink_amount}={drink_amount_num}, '''
+        cmd = cmd + f'''{drink_amount}='{drink_amount_num}', '''
 
     cmd = cmd[:-2]
     my_pysql.update_recipe(session['session_id'], cmd, recipe_name)
@@ -144,14 +210,14 @@ def login():
     if 'session_id' in session:     # 이미 로그인한 상태
         return redirect('/')
     else:
-        return render_template('./login/login.html', form = my_wtforms.login_form() , login_state = False)
+        return render_template('./login/login.html', login_state = False)
 
 @app.route('/register/')
 def register():
     if 'session_id' in session:     # 이미 로그인한 상태
         return redirect('/')
     else:
-        return render_template('./login/register.html', form = my_wtforms.register_form(), login_state = False)
+        return render_template('./login/register.html', login_state = False)
 
 @app.route('/logout/', methods=['post'])
 def logout():
@@ -207,11 +273,11 @@ def register_process():
 
 @app.route('/drop_process/', methods=['post'])
 def drop_process():
-    if session['session_id'] == 'admin':
+    if session['session_id'] == 'dbadmin':
         # 체크가 안돼있으면 에러 발생 따라서 try/except 이용
         try:
             if request.form['selcetd_user'] == '1':
-                if request.form['user_id'] != 'admin':
+                if request.form['user_id'] != 'dbadmin':
                     sql_message = my_pysql.drop_user(request.form['user_id'])
         except:
             pass
@@ -227,11 +293,24 @@ def pw_clear_process():
     # 체크가 안돼있으면 에러 발생 따라서 try/except 이용
     try:
         if request.form['selcetd_user'] == '1':
-            if request.form['user_id'] != 'admin':
-                    my_pysql.pw_clear(request.form['user_id'])
+            my_pysql.pw_clear(request.form['user_id'])
     except:
         pass
     return render_template('./login/admin.html', login_state=True, user_id=session['session_id'], all_users=my_pysql.all_users())  
+
+
+@app.route('/recovery_process/', methods=['post'])
+def recovery_process():
+    # 체크가 안돼있으면 에러 발생 따라서 try/except 이용
+    try:
+        if request.form['selcetd_user'] == '1':
+            my_pysql.recovery(request.form['user_id'])
+    except:
+        pass
+    return render_template('./login/admin.html', login_state=True, user_id=session['session_id'], all_users=my_pysql.all_users())  
+
+
+
 
 
 @app.route('/update_process/', methods=['post'])      

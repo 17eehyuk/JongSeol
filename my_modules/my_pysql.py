@@ -1,13 +1,22 @@
 import pymysql
 
-#MySQL 접속
+# AWS
 mydb = pymysql.connect(
-    user='global',
-    database='tmpdb',
+    user='tmp',
+    database='jongseol',
     passwd='1234',
-    host='localhost',
+    host='3.39.94.57',
     charset='utf8'
 )
+# # Local
+# mydb = pymysql.connect(
+#     user='tmp',
+#     database='jongseol',
+#     passwd='1234',
+#     host='localhost',
+#     charset='utf8'
+# )
+
 
 #커서생성
 sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
@@ -15,7 +24,7 @@ sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
 #로그인
 def login(id, pw):
     command = f'''
-    SELECT id, pw FROM users WHERE id = '{id}' AND pw = password('{pw}');
+    SELECT id, pw FROM users WHERE id = '{id}' AND pw = md5('{pw}') AND state='0';
     '''
     sql_cursor.execute(command)
     result = sql_cursor.fetchone()
@@ -25,10 +34,10 @@ def login(id, pw):
         return result        # 데이터가 있으며 {'userid': 'A', 'userpw': '1234'}, 없으면 None 이 return됨
 #회원가입
 def register(id, pw, sex, yb):
-    if id=='admin':
-        return '''admin은 사용불가능 합니다.'''
+    if (id=='admin') or (id=='dbadmin') or not(str(id).isalnum()):      # not(str(id).isalnum()): 특수문자방지
+        return '''사용불가능한 id 입니다.'''
     command = f'''
-    INSERT INTO users VALUES ('{id}', password('{pw}'), '{sex}', '{yb}');
+    INSERT INTO users VALUES ('{id}', md5('{pw}'), '{sex}', '{yb}', '0');
     '''
     try:
         sql_cursor.execute(command)         # 중복인 경우 에러 발생하므로 try/except 사용
@@ -38,21 +47,18 @@ def register(id, pw, sex, yb):
         return f'''아이디 : '{id}' 중복입니다. 다른 아이디를 사용해 주세요'''
     
 
+
+
 #회원탈퇴
 def drop_user(id):
     command = f'''
-        SHOW TABLES
-        '''
+    UPDATE users SET state='1' WHERE id = '{id}';
+    '''
     sql_cursor.execute(command)
-    tables =  sql_cursor.fetchall()
-    for table in tables:
-        current_table = list(dict(table).values())[0]        # 현재 테이블명
-        command = f'''
-        DELETE FROM {current_table} WHERE id='{id}';
-        '''
-        sql_cursor.execute(command)
-        mydb.commit()
+    mydb.commit()
     return f'''사용자 '{id}' 탈퇴 성공'''
+
+
 
 #개인정보확인
 def my_profile(id):
@@ -76,33 +82,14 @@ def update_profile(sex, yb, pw, id):
     else:
         #비밀번호 까지 변경
         command = f'''
-            UPDATE users SET sex='{sex}', yb='{yb}', pw=password('{pw}') WHERE id = '{id}';
+            UPDATE users SET sex='{sex}', yb='{yb}', pw=md5('{pw}') WHERE id = '{id}';
         '''
         sql_cursor.execute(command)
         mydb.commit()
         return print('업데이트성공')
 
-#모든유저출력
-def all_users():
-    command = f'''
-    SELECT id FROM users;
-    '''
-    sql_cursor.execute(command)
-    tables =  sql_cursor.fetchall()
-    users = []
-    for table in tables:
-        users.append(table['id'])
-    return users
 
-#PW초기화(1234로 초기화시킴)    #admin만 가능
-def pw_clear(id):
-    #비밀번호 까지 변경
-    command = f'''
-        UPDATE users SET pw=password('1234') WHERE id = '{id}';
-    '''
-    sql_cursor.execute(command)
-    mydb.commit()
-    return print('비밀번호 초기화 성공(1234)')
+
 
 
 #새로운 레시피 생성
@@ -177,8 +164,49 @@ def update_recipe(id, cmd, recipe_name):
 
 
 
+############## 관리자 ################
 
-############## 로컬 ################
+
+#모든유저출력
+def all_users():
+    command = f'''
+    SELECT id FROM users;
+    '''
+    sql_cursor.execute(command)
+    tables =  sql_cursor.fetchall()
+    users = []
+    for table in tables:
+        users.append(table['id'])
+    return users
+
+#PW초기화(1234로 초기화시킴)    #admin만 가능
+def pw_clear(id):
+    #비밀번호 까지 변경
+    command = f'''
+        UPDATE users SET pw=md5('1234') WHERE id = '{id}';
+    '''
+    sql_cursor.execute(command)
+    mydb.commit()
+    return print('비밀번호 초기화 성공(1234)')
+
+
+# 계정복구
+def recovery(id):
+    command = f'''
+    UPDATE users SET state='0' WHERE id = '{id}';
+    '''
+    sql_cursor.execute(command)
+    mydb.commit()
+    return print('복구성공')
+
+
+
+
+
+
+
+
+############## 더미코드 ################
 
 # #노즐출력
 # def nozzles(id):
@@ -188,10 +216,28 @@ def update_recipe(id, cmd, recipe_name):
 #     sql_cursor.execute(command)
 #     return list(dict(sql_cursor.fetchone()).values())[1:]       # [None, None, None, None, None, None, None, None]
 
-def nozzle_update(new_datas, id):
-    command = f'''
-    UPDATE nozzles SET {new_datas} WHERE id = '{id}';
-    '''
-    sql_cursor.execute(command)
-    mydb.commit()
-    return print('업데이트성공')
+# def nozzle_update(new_datas, id):
+#     command = f'''
+#     UPDATE nozzles SET {new_datas} WHERE id = '{id}';
+#     '''
+#     sql_cursor.execute(command)
+#     mydb.commit()
+#     return print('업데이트성공')
+
+
+# #회원탈퇴
+# def drop_user(id):
+#     command = f'''
+#         SHOW TABLES
+#         '''
+#     sql_cursor.execute(command)
+#     tables =  sql_cursor.fetchall()
+#     for table in tables:
+#         current_table = list(dict(table).values())[0]        # 현재 테이블명
+#         command = f'''
+#         DELETE FROM {current_table} WHERE id='{id}';
+#         '''
+#         sql_cursor.execute(command)
+#         mydb.commit()
+#     return f'''사용자 '{id}' 탈퇴 성공'''
+

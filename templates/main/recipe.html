@@ -9,7 +9,7 @@
 {% block content %}
 
 <h2>레시피</h2>
-최대 5개까지 추가가능
+최대 8개까지 추가가능
 <br>
 <br>
 <form method="post">
@@ -25,14 +25,21 @@
 {% endif %}
 
     
-{% if recipes|length < 5  %}
+{% if recipes|length < 8  %}
     <input type="submit" value="새 레시피" id="new_recipe_btn" formaction="/new_recipe/">
 {% else %}
     <input type="submit" value="새 레시피" id="new_recipe_btn" formaction="/new_recipe/" disabled>
 {% endif %}
 </form>
 
-
-{{ html_message }}
+{% if html_message == 1 %}
+<br>
+{{recipe_name}}<br>
+{{html_alert}}<br>
+{{serial_result}}
+<script>
+    alert(`{{html_alert}}`);
+</script>
+{% endif %}
 
 {% endblock %}

@@ -28,24 +28,20 @@
         <tr>
             <td>{{recipe_dict[drink]}}</td>
             <td>{{recipe_dict[drink_amount]}}</td>
+            <input type="hidden" name="drink{{i}}" value="{{recipe_dict[drink]}}">
+            <input type="hidden" name="drink{{i}}_amount" value="{{recipe_dict[drink_amount]}}">
         </tr>
-        {% endfor %}  
+    {% endfor %}  
 
-    {#
-        {% for i in range(leng) %}
-        {% set drink = 'drink'+(i|string) %}
-        {% set drink_amount = 'drink'+(i|string)+'_amount' %}
-            {{drink}}
-            {{drink_amount}}
-        {% endfor %} 
-    #}
+
         
 </table>   
 
+<br>
 
-
-<input type="submit" formaction="/delete_recipe/" value="삭제하기">
+<input type="submit" formaction="/make_recipe/" value="만들기">
 <input type="submit" formaction="/update_recipe/" value="수정하기">
+<input type="submit" formaction="/delete_recipe/" value="삭제하기">
 </form>
 
 
