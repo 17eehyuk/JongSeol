@@ -14,4 +14,11 @@
 {#<img id="team_introducing_picture" src="{{ url_for('static', filename='./images/model.png') }}">#}
 {#<img id="team_introducing_picture" src="http://3.39.94.57:8000/img">#}
 
+{% if alert=='조작' %}
+<script>
+    alert('조작하지마라')
+</script>
+{% endif %}
+
+
 {% endblock %}

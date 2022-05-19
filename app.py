@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, flash
 from my_modules import my_pysql
 import json
 import serial
@@ -13,6 +13,7 @@ def local():
         return json.load(json_file)
 
 def len3(string):
+    string =str(string)
     if len(string) == 1:
         string = '00'+string
     elif len(string) == 2:
@@ -129,6 +130,7 @@ def update_recipe():
 @app.route('/make_recipe/', methods=['POST'])
 def make_recipe():
     recipe_dict = dict(request.form)                # {'recipe_name': '아메리카노', 'drink0': '물', 'drink0_amount': '200', 'drink1': '에스프레소', 'drink1_amount': '25'}
+    print(recipe_dict)
     recipe_name = recipe_dict['recipe_name']        # 아메리카노
     recipe_len = int((len(recipe_dict)-1)/2)        # 2 (레시피 길이 추출)
     nozzles=local()                                 # {'admin_id': 'admin', 'admin_pw': '1251', 'nozzle0': '', 'nozzle1': '', 'nozzle2': '', 'nozzle3': '우유', 'nozzle4': '', 'nozzle5': '', 'nozzle6': '물', 'nozzle7': '에스프레소'}
@@ -138,15 +140,30 @@ def make_recipe():
 
     for i in range(recipe_len):
         no_nozzle = 1
-        drink = recipe_dict['drink'+str(i)]
+        drink = recipe_dict['drink'+str(i)]         # 받은값
         for j in range(8):
-            nozzle = nozzles['nozzle'+str(j)]
-            if drink==nozzle:
-                cmd = cmd + str(j) + len3(recipe_dict['drink'+str(i)+'_amount'])
-                no_nozzle = 0
-                break
+            nozzle = nozzles['nozzle'+str(j)]       # json노즐
+            if nozzle==drink:
+                try:
+                    drink_amount = int(recipe_dict['drink'+str(i)+'_amount'])
+                    if not((drink_amount >= 0) and (drink_amount <= 600)):
+                        print('try')
+                        no_nozzle = 2
+                        break
+                    else:
+                        cmd = cmd + str(j) + len3(drink_amount)
+                        no_nozzle = 0
+                        break
+                except:
+                    print('except')
+                    no_nozzle = 2
+                    break
+                
         if no_nozzle == 1:
             err = err + f'''{drink} 노즐없음, '''
+        if no_nozzle == 2:
+            err = '조작하지마라  '
+            break
     
     alert = ''
     print(err[:-2])
@@ -174,7 +191,8 @@ def managing_process():
 
 @app.route('/new_recipe_process/', methods=['POST'])
 def new_recipe_process():
-    my_pysql.new_recipe(request.form)
+    if(my_pysql.new_recipe(session['session_id'],request.form)=='조작'):
+        return render_template('index.html', login_state=True, user_id=session['session_id'], alert='조작')
     return redirect('/recipe/')
 
 @app.route('/delete_recipe_process/', methods=['POST'])
@@ -318,7 +336,9 @@ def update_process():
     new_sex = request.form['user_sex']
     new_yb = request.form['user_yb']
     new_pw = request.form['user_pw']
-    my_pysql.update_profile(new_sex, new_yb, new_pw, session['session_id'])
+    if(my_pysql.update_profile(new_sex, new_yb, new_pw, session['session_id']) == '조작'):
+        return render_template('index.html', login_state=True, user_id=session['session_id'], alert='조작')
+
     return redirect('/managing/')
 
 ############################################################### errs ###############################################################

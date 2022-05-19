@@ -1,4 +1,5 @@
 import pymysql
+import datetime
 
 # AWS
 mydb = pymysql.connect(
@@ -71,6 +72,17 @@ def my_profile(id):
 #개인정보 수정
 def update_profile(sex, yb, pw, id):
 
+    if not((sex=='M')or(sex=='F')):
+        return '조작'
+
+    try:
+        yb = int(yb)
+        adult_year = datetime.datetime.now().year -18
+        if not((yb>=1900) and (yb<=adult_year)):
+            return '조작'
+    except:
+        return '조작'
+
     if pw == '':        
         #비밀번호 변경X
         command = f'''
@@ -93,19 +105,48 @@ def update_profile(sex, yb, pw, id):
 
 
 #새로운 레시피 생성
-def new_recipe(dic):
-    tmp_dict = dict(dic)
-    keys =''
-    values = ''
-    for key, value in tmp_dict.items():
-        keys = keys + key + ','
-        values = values + "'" + value + "'" + ","
-    keys = keys[:-1]
-    values = values[:-1] 
+def new_recipe(id, dic):
+    tmp_dict = dict(dic)                     # {'id': 'a', 'author': 'a', 'recipe_name': '물', 'drink0': '물', 'drink0_amount': '200'}
+    dic_len = int((len(tmp_dict) - 3)/2)     # id, author, recipe_name
+
+    if (dic_len<1) or (dic_len>8):       # 행이 하나도 없다는 의미, 행을 많이 추가한 경우
+        return '조작'
+
+
+    print(tmp_dict) 
+    try:
+        if (id != tmp_dict['id'] or id != tmp_dict['author']):        # 새 레시피이기 때문에 반드시 id와 author가 같아야됨
+            return '조작'
+    except:
+        return '조작'
+
+    keys ='id , author, recipe_name, '
+    values = f''' '{tmp_dict['id']}', '{tmp_dict['author']}', '{tmp_dict['recipe_name']}', '''
+
+
+    for i in range(dic_len):
+        drink = 'drink' + str(i)                # drink0
+        drink_amount = drink + '_amount'        # drink0_amount
+
+        keys = keys + drink + ', ' + drink_amount + ', '
+
+        try:
+            amount = int(tmp_dict[drink_amount])
+            if not((amount >= 0) and (amount <= 600)):
+                return '조작'
+        except:
+            return '조작'       # 숫자로 안바뀐다는 의미 따라서 조작
+
+
+        values = values + f''' '{tmp_dict[drink]}', '{tmp_dict[drink_amount]}', '''
+    keys = keys[:-2]
+    values = values[:-2] 
 
     command = f'''
     INSERT INTO recipes ({keys}) values  ({values});
     '''
+    print(command)
+
     sql_cursor.execute(command)
     mydb.commit()
     return print('레시피 추가 성공')

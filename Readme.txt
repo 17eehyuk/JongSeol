@@ -6,7 +6,6 @@ app.py : 메인
 
 설치한 모듈
 pip install flask
-pip install flask_wtf
 pip install pymysql
 
 

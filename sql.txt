@@ -33,9 +33,9 @@ INSERT INTO users VALUES ('dbadmin', md5('1234'), 'A', '9999', '0');
 
 #recipes(간략화)
 CREATE TABLE recipes(
-id VARCHAR(10),
-author VARCHAR(10),
-recipe_name VARCHAR(10),
+id VARCHAR(10) NOT NULL,
+author VARCHAR(10) NOT NULL,
+recipe_name VARCHAR(10) NOT NULL,
 drink0 VARCHAR(10),
 drink0_amount CHAR(3),
 drink1 VARCHAR(10),
@@ -52,9 +52,9 @@ drink3_amount CHAR(3)
 
 #recipes
 CREATE TABLE recipes(
-id VARCHAR(10),
-author VARCHAR(10),
-recipe_name VARCHAR(10),
+id VARCHAR(10) NOT NULL,
+author VARCHAR(10) NOT NULL,
+recipe_name VARCHAR(10) NOT NULL,
 drink0 VARCHAR(10),
 drink0_amount CHAR(3),
 drink1 VARCHAR(10),
