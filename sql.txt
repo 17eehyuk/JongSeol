@@ -11,7 +11,7 @@ SELECT * FROM recipes;
 DROP DATABASE jongseol;
 
 #Table 삭제
-DROP TABLE users;
+DROP TABLE recipes;
 
 #DB생성(UTF8)
 CREATE DATABASE jongseol DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
@@ -32,6 +32,36 @@ INSERT INTO users VALUES ('dbadmin', md5('1234'), 'A', '9999', '0');
 
 
 #recipes(간략화)
+# url: 주소, share: 공개여부, time: 제작시간, share_time:공유시간, title: 글제목, id: 저장위치, author: 작성자, recipe_name: 레시피명, content: 글내용, comments: 댓글
+CREATE TABLE recipes(
+url VARCHAR(15) UNIQUE NOT NULL,
+share CHAR(1) NOT NULL default '0',
+time timestamp NOT NULL default now(),
+share_time timestamp NOT NULL default now(),
+title VARCHAR(20) NOT NULL default '',
+id VARCHAR(10) NOT NULL,
+author VARCHAR(10) NOT NULL,
+recipe_name VARCHAR(10) NOT NULL,
+drink0 VARCHAR(10),
+drink0_amount CHAR(3),
+drink1 VARCHAR(10),
+drink1_amount CHAR(3),
+drink2 VARCHAR(10),
+drink2_amount CHAR(3),
+drink3 VARCHAR(10),
+drink3_amount CHAR(3),
+content VARCHAR(200) NOT NULL default '',
+comments JSON default '{}'
+);
+
+
+DROP TABLE recipes;
+SELECT * FROM recipes;
+
+
+
+
+#recipes(간략화)
 CREATE TABLE recipes(
 id VARCHAR(10) NOT NULL,
 author VARCHAR(10) NOT NULL,
@@ -45,7 +75,6 @@ drink2_amount CHAR(3),
 drink3 VARCHAR(10),
 drink3_amount CHAR(3)
 );
-
 
 
 
@@ -73,5 +102,33 @@ drink7 VARCHAR(10),
 drink7_amount CHAR(3)
 );
 
+
+#sharing
+CREATE TABLE sharing(
+url VARCHAR(15) UNIQUE NOT NULL,
+title VARCHAR(20) NOT NULL,
+id VARCHAR(10) NOT NULL,
+author VARCHAR(10) NOT NULL,
+time timestamp NOT NULL default now(),
+recipe_name VARCHAR(10) NOT NULL,
+drink0 VARCHAR(10),
+drink0_amount CHAR(3),
+drink1 VARCHAR(10),
+drink1_amount CHAR(3),
+drink2 VARCHAR(10),
+drink2_amount CHAR(3),
+drink3 VARCHAR(10),
+drink3_amount CHAR(3),
+drink4 VARCHAR(10),
+drink4_amount CHAR(3),
+drink5 VARCHAR(10),
+drink5_amount CHAR(3),
+drink6 VARCHAR(10),
+drink6_amount CHAR(3),
+drink7 VARCHAR(10),
+drink7_amount CHAR(3),
+content VARCHAR(200),
+comments JSON
+);
 
 

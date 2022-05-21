@@ -31,15 +31,7 @@
     <input type="submit" value="새 레시피" id="new_recipe_btn" formaction="/new_recipe/" disabled>
 {% endif %}
 </form>
-
-{% if html_message == 1 %}
 <br>
-{{recipe_name}}<br>
-{{html_alert}}<br>
 {{serial_result}}
-<script>
-    alert(`{{html_alert}}`);
-</script>
-{% endif %}
 
 {% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    레시피보기
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+<form>
+    <input type="text" name="title" placeholder="글제목"><br>
+
+    <h3>레시피명 : {{ recipe['recipe_name'] }}</h3>
+<table border="1px">
+    <tr>
+        <th>음료명</th>
+        <th>음료양</th>
+    </tr>
+    
+    {% for i in range(4) %}
+        {% set drink = 'drink'+(i|string) %}
+        {% set drink_amount = drink+'_amount' %}
+
+        {% if recipe[drink] != None %}
+        <tr>
+            <td>{{recipe[drink]}}</td>
+            <td>{{recipe[drink_amount]}}</td>
+        </tr>
+        {% endif %}
+    {% endfor %}  
+</table> 
+
+<textarea name="content" placeholder="글설명"></textarea>
+
+<input type="submit" value="저장">
+</form>
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+{% endblock %}

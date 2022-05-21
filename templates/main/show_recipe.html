@@ -9,12 +9,14 @@
 {% block content %}
 
 
-{% set leng = (((recipe_dict|length)-3)/2)|int %}  {# -3: id,author,recipe_name #}           {# /2: drink,drink_amount #}
 
 <h2>{{ recipe_dict['recipe_name'] }} (작성자 : {{ recipe_dict['author'] }})</h2>
+작성한날짜 {{ recipe_dict['time'] }}<br>
+
 <br>
 <form method="post">
 <input type="hidden" name="recipe_name" value="{{ recipe_dict['recipe_name'] }}">
+<input type="hidden" name="url" value="{{ recipe_dict['url'] }}">
 
 <table border="1px">
     <tr>
@@ -22,15 +24,18 @@
         <th>음료양</th>
     </tr>
     
-    {% for i in range(leng) %}
+    {% for i in range(4) %}
         {% set drink = 'drink'+(i|string) %}
         {% set drink_amount = drink+'_amount' %}
+
+        {% if recipe_dict[drink] != None %}
         <tr>
             <td>{{recipe_dict[drink]}}</td>
             <td>{{recipe_dict[drink_amount]}}</td>
             <input type="hidden" name="drink{{i}}" value="{{recipe_dict[drink]}}">
             <input type="hidden" name="drink{{i}}_amount" value="{{recipe_dict[drink_amount]}}">
         </tr>
+        {% endif %}
     {% endfor %}  
 
 
@@ -40,6 +45,7 @@
 <br>
 
 <input type="submit" formaction="/make_recipe/" value="만들기">
+<input type="submit" formaction="/sharing_page/" value="공유하기">
 <input type="submit" formaction="/update_recipe/" value="수정하기">
 <input type="submit" formaction="/delete_recipe/" value="삭제하기">
 </form>

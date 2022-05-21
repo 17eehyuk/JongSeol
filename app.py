@@ -48,6 +48,11 @@ def my_serial(cmd):
     return rx_result
 
 
+def manipulated():
+    flash('조작감지')
+    return render_template('index.html', login_state=True, user_id=session['session_id'])
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # 더미코드
@@ -92,7 +97,7 @@ def recipe():
     except:
         pass
     if 'session_id' in session:
-            return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']), html_message=0)
+            return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']))
     else:
         return render_template('./login/login.html', login_state = False)
         
@@ -162,8 +167,8 @@ def make_recipe():
         if no_nozzle == 1:
             err = err + f'''{drink} 노즐없음, '''
         if no_nozzle == 2:
-            err = '조작하지마라  '
-            break
+            # 조작함
+            return manipulated()
     
     alert = ''
     print(err[:-2])
@@ -173,7 +178,33 @@ def make_recipe():
     else:
         alert = err[:-2]
         serial_result = ''
-    return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']),html_message=1,recipe_name=recipe_name, html_alert=alert, serial_result=serial_result) 
+
+    flash(alert)
+    return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']), serial_result=serial_result)
+
+
+@app.route('/sharing/')
+def sharing_home():
+    print('a')
+    return 'sharing'
+
+@app.route('/sharing/<url>/')
+def sharing_read(url):
+    print('a')
+    return url
+
+
+
+@app.route('/sharing_page/', methods=['POST'])
+def sharing_page():
+    recipe = my_pysql.show_recipe_url(request.form['url'])
+    print(recipe)
+
+    if recipe['share'] == '1':
+        flash('이미공유중')
+
+
+    return render_template('./main/sharing_page.html', login_state=True, user_id=session['session_id'], recipe=recipe)
 
 
 
@@ -191,8 +222,9 @@ def managing_process():
 
 @app.route('/new_recipe_process/', methods=['POST'])
 def new_recipe_process():
-    if(my_pysql.new_recipe(session['session_id'],request.form)=='조작'):
-        return render_template('index.html', login_state=True, user_id=session['session_id'], alert='조작')
+    if(my_pysql.new_recipe(session['session_id'],request.form)=='manipulated'):
+        return manipulated()
+    flash('추가완료')
     return redirect('/recipe/')
 
 @app.route('/delete_recipe_process/', methods=['POST'])
@@ -250,7 +282,6 @@ def update_user():
 
 @app.route('/drop_user/', methods=['post'])
 def drop_user():
-    #print(request.form)
     return render_template('./login/drop_user.html', login_state=True, user_id=session['session_id'])
 
 @app.route('/admin/', methods=['POST'])
@@ -266,7 +297,8 @@ def login_process():
         sql_result = my_pysql.login(user_id, user_pw)
         # 로그인 실패 (실패시 '''로그인에 실패했습니다.''' 가 반환되므로 type('str') 이다.)
         if type(sql_result) == type('str'):
-            return render_template('frame.html', message_state = True, frame_message = sql_result)
+            flash(sql_result)
+            return redirect('/')
         # 로그인 성공
         else:
             session['session_id'] = user_id    # 세션에 현재 아이디 입력
@@ -276,18 +308,21 @@ def login_process():
             session['session_id'] = user_id    # 성공
             return redirect('/')
         else:
-            return render_template('frame.html', message_state = True, frame_message = '로그인에 실패했습니다.')
+            flash('로그인에 실패했습니다.')
+            return redirect('/')
 
     
 
 @app.route('/register_process/', methods=['POST'])
 def register_process():
+    print(request.form)
     user_id = request.form['user_id']
     user_pw = request.form['user_pw']
     user_sex = request.form['user_sex']
     user_yb = request.form['user_yb']
-    sql_message =my_pysql.register(user_id, user_pw, user_sex, user_yb)      # return값을 반환하기 때문('이미 존재하는 회원', '회원가입 완료')
-    return render_template('frame.html', message_state = True, frame_message = sql_message)
+    sql_message = my_pysql.register(user_id, user_pw, user_sex, user_yb)      # return값을 반환하기 때문('이미 존재하는 회원', '회원가입 완료')
+    flash(sql_message)
+    return redirect('/')
 
 @app.route('/drop_process/', methods=['post'])
 def drop_process():
@@ -297,21 +332,22 @@ def drop_process():
             if request.form['selcetd_user'] == '1':
                 if request.form['user_id'] != 'dbadmin':
                     sql_message = my_pysql.drop_user(request.form['user_id'])
+                    flash(sql_message)
         except:
             pass
         return render_template('./login/admin.html', login_state=True, user_id=session['session_id'], all_users=my_pysql.all_users())  
     else:
-        sql_message = my_pysql.drop_user(request.form['user_id'])
-        if request.form['user_id'] != 'admin':
-            session.pop('session_id')      # session에서 제거
-        return render_template('frame.html', message_state = True, frame_message = sql_message)
+        my_pysql.drop_user(request.form['user_id'])
+        session.pop('session_id')      # session에서 제거
+        return redirect('/')
 
 @app.route('/pw_clear_process/', methods=['post'])
 def pw_clear_process():
     # 체크가 안돼있으면 에러 발생 따라서 try/except 이용
     try:
         if request.form['selcetd_user'] == '1':
-            my_pysql.pw_clear(request.form['user_id'])
+            sql_message = my_pysql.pw_clear(request.form['user_id'])
+            flash(sql_message)
     except:
         pass
     return render_template('./login/admin.html', login_state=True, user_id=session['session_id'], all_users=my_pysql.all_users())  
@@ -322,7 +358,8 @@ def recovery_process():
     # 체크가 안돼있으면 에러 발생 따라서 try/except 이용
     try:
         if request.form['selcetd_user'] == '1':
-            my_pysql.recovery(request.form['user_id'])
+            sql_message = my_pysql.recovery(request.form['user_id'])
+            flash(sql_message)
     except:
         pass
     return render_template('./login/admin.html', login_state=True, user_id=session['session_id'], all_users=my_pysql.all_users())  
@@ -336,25 +373,20 @@ def update_process():
     new_sex = request.form['user_sex']
     new_yb = request.form['user_yb']
     new_pw = request.form['user_pw']
-    if(my_pysql.update_profile(new_sex, new_yb, new_pw, session['session_id']) == '조작'):
-        return render_template('index.html', login_state=True, user_id=session['session_id'], alert='조작')
-
+    if(my_pysql.update_profile(new_sex, new_yb, new_pw, session['session_id']) == 'manipulated'):
+        return manipulated()
     return redirect('/managing/')
 
 ############################################################### errs ###############################################################
 @app.errorhandler(404)
 def page_not_found(error):
-    if 'session_id' in session:
-        return render_template('./errs/404.html', login_state=True, user_id=session['session_id'])
-    else:
-        return render_template('./errs/404.html', login_state=False)
+    flash('페이지없음')
+    return redirect('/')
 
 @app.errorhandler(405)
 def page_not_found(error):
-    if 'session_id' in session:
-        return render_template('./errs/405.html', login_state=True, user_id=session['session_id'])
-    else:
-        return render_template('./errs/405.html', login_state=False)
+    flash('잘못된접근')
+    return redirect('/')
 ####################################################################################################################################
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

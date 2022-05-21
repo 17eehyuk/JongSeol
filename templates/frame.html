@@ -60,20 +60,19 @@
                 {% else %}
                 <li><a href="/managing/">관리</a></li>
                 <li><a href="/recipe/">레시피</a></li>
-
-
-                
+                <li><a href="/sharing/">공유</a></li>       
                 {% endif %}
-                
-
             </ol>
         </nav>
         <article>
-            {% if message_state == True %}
-                <h2><a href="/">홈으로</a></h2>
-                <br>
-                {{ frame_message }}                
-            {% endif %}
+            {# flash 메시지 출력 #}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <script>
+                        alert(`{{messages[-1]}}`)
+                    </script>
+                {% endif %}
+            {% endwith %}
 
             {% block content %}
             {% endblock %}
