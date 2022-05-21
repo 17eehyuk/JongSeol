@@ -155,9 +155,6 @@ function update_dect(){
   row_count = Number($('#row_count').val())   //현재 행의 개수
   amount_sum = 0
   sum_flag=0
-  for(var i=0; i<row_count; i++){
-    amount = $(`#drink${i}_amount`).val();
-
 
   // 기존 레시피명 중복인지 판단
   var existing_recipe = $('#existing_recipe').html().split(',')
@@ -182,15 +179,15 @@ function update_dect(){
     }
   }
 
-
-
-
-
+  for(var i=0; i<row_count; i++){
+    amount = $(`#drink${i}_amount`).val();
     if(amount==''){return alert('데이터를 입력하세요')}
     else{
       amount_sum = amount_sum + Number(amount)
     }
   }
+    
+
   if(amount_sum>=0 && amount_sum<=700){sum_flag=0} //문제없음
   else{sum_flag=1}  //문제있음
 

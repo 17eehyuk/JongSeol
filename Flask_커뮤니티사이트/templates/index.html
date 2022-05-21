@@ -1,0 +1,17 @@
+{% extends 'frame.html' %}
+
+{% block content %}
+<div>
+{% if articles == 'empty' %}
+    없음
+{% else %}
+    {% for article in articles %}
+        <fieldset>
+            <h3><a href="/{{article['url']}}/read">{{article['title']}}</a></h3>
+            작성자 : {{article['author']}}<br>
+            {{article['time']}}
+        </fieldset><br>    
+    {% endfor %}
+{% endif %}
+</div>
+{% endblock %}

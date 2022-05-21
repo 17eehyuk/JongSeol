@@ -5,7 +5,7 @@ import serial
 
 app = Flask(__name__)
 app.secret_key = "ssijfo@#!@#123"       # session을 사용하기 위해서는 반드시 있어야함
-
+app.jinja_env.add_extension('jinja2.ext.loopcontrols')      # jinja에서 break 사용가능
 
 def local():
     path = "./local.json"
@@ -185,13 +185,20 @@ def make_recipe():
 
 @app.route('/sharing/')
 def sharing_home():
-    print('a')
-    return 'sharing'
+    recipes = my_pysql.show_all_sharings()
+    if 'session_id' in session:
+        return render_template('./main/sharing.html', login_state=True, user_id=session['session_id'], recipes=recipes)
+    else:
+        return render_template('./login/login.html', login_state = False)
+    
 
-@app.route('/sharing/<url>/')
+@app.route('/sharing_read/<url>/', methods=['GET','POST'])
 def sharing_read(url):
-    print('a')
-    return url
+    recipe = my_pysql.show_recipe_url(url)
+    if 'session_id' in session:
+        return render_template('./main/sharing_read.html', login_state=True, user_id=session['session_id'], recipe=recipe)
+    else:
+        return render_template('./login/login.html', login_state = False)
 
 
 
@@ -199,14 +206,17 @@ def sharing_read(url):
 def sharing_page():
     recipe = my_pysql.show_recipe_url(request.form['url'])
     print(recipe)
-
     if recipe['share'] == '1':
         flash('이미공유중')
-
-
+        return redirect(f'''/sharing_read/{recipe['url']}/''')
     return render_template('./main/sharing_page.html', login_state=True, user_id=session['session_id'], recipe=recipe)
 
-
+@app.route('/sharing_process/<url>/', methods=['POST'])
+def sharing_process(url):    
+    title = request.form['title']
+    content = request.form['content']
+    my_pysql.sharing(url, title, content)
+    return redirect(f'/sharing_read/{url}/')
 
 ############################################################### main_processes ###############################################################
 @app.route('/managing_process/', methods=['POST'])

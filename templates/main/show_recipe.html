@@ -10,8 +10,16 @@
 
 
 
+
 <h2>{{ recipe_dict['recipe_name'] }} (작성자 : {{ recipe_dict['author'] }})</h2>
 작성한날짜 {{ recipe_dict['time'] }}<br>
+
+{% if recipe_dict['share'] == '1' %}
+상태 : 공유중<br>
+{% else %}
+상태 : 공유하고있지않음<br>
+{% endif %}
+
 
 <br>
 <form method="post">

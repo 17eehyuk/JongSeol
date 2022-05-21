@@ -256,6 +256,37 @@ def show_recipe_url(url):
     return result_dict
 
 
+
+# {'url': '165313508204980', 'share': '0', 'time': datetime.datetime(2022, 5, 21, 21, 11, 22), 'share_time': datetime.datetime(2022, 5, 21, 21, 11, 22), 'title': '', 'id': 'a', 'author': 'a',
+# 'recipe_name': 'gd', 'drink0': '노', 'drink0_amount': '600', 'drink1': None, 'drink1_amount': None, 'drink2': None, 'drink2_amount': None, 'drink3': None, 'drink3_amount': None, 'content': '', 'comments': '{}'}
+
+
+def sharing(url, title, content):
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    cmd = f'''
+    share='1', share_time='{now}', title='{title}', content='{content}'
+    '''
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    command = f'''
+    UPDATE recipes SET {cmd} WHERE url= '{url}';
+    '''
+    sql_cursor.execute(command)
+    sql_cursor.close()
+    return print('공유완료')
+
+def show_all_sharings():
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    command = f'''
+    SELECT * FROM recipes WHERE share='1' ORDER BY share_time DESC;
+    '''
+    sql_cursor.execute(command)
+    recipes = sql_cursor.fetchall()   # 없는경우는 tuple임    # 있는경우는 list임
+    sql_cursor.close()
+    if recipes == ():
+        recipes = 'empty'
+    return recipes
+
+
 ############## 관리자 ################
 
 

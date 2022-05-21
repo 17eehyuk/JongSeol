@@ -28,25 +28,26 @@
         <th>음료명</th>
         <th>음료양</th>
     </tr>
+
     
-    {% for i in range(leng) %}
+    {% set leng = 0 %}
+    {% for i in range(4) %}
+
         {% set drink = 'drink'+(i|string) %}
         {% set drink_amount = drink+'_amount' %}
+
+        {% if recipe_dict[drink] != None %}
         <tr>
             <td>{{recipe_dict[drink]}}</td>
             <input type="hidden" name="drink{{i}}" value="{{recipe_dict[drink]}}">
             <td><input type="number" id="drink{{i}}_amount" name="drink{{i}}_amount" value="{{recipe_dict[drink_amount]}}" placeholder="{{i}}번음료" oninput="num_only(this); NO_over_600(this)"></td>
         </tr>
-        {% endfor %}  
+        {% else %}
+        <input type="hidden" id="row_count" value="{{i}}" disabled>
+        {% break %}
+        {% endif %}
+    {% endfor %}  
 
-    {#
-        {% for i in range(leng) %}
-        {% set drink = 'drink'+(i|string) %}
-        {% set drink_amount = 'drink'+(i|string)+'_amount' %}
-            {{drink}}
-            {{drink_amount}}
-        {% endfor %} 
-    #}
         
 </table>   
 
@@ -55,8 +56,10 @@
 <input type="button" id="update_dect_btn" onclick="update_dect()" value="유효성검사">
 <input type="button" id="modify_btn" value="수정하기" onclick="update_modify()" disabled>
 <input type="submit" id="update_btn" formaction="/update_recipe_process/" value="저장하기" disabled>
+<input type="submit" value="이전으로" formaction="/show_recipe/">
+
 </form>
-<input type="hidden" id="row_count" value="{{leng}}" disabled>
+
 
 
 {% endblock %}

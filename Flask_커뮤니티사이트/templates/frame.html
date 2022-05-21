@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>커뮤니티사이트(17eehyuk)</title>
+        <style>
+            * {margin: 0; padding: 0}       /*css reset*/
+
+            div{
+                margin: 0 auto; width: 80%;
+            }
+            span{
+                float: right;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h1><a href="/">커뮤니티사이트(17eehyuk)</a></h1>
+            <br>
+            <a href="/new_article">글쓰기</a>
+        </div>
+        {# flash 메시지 출력 #}
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <script>
+                    alert(`{{messages[-1]}}`)
+                </script>
+            {% endif %}
+        {% endwith %}
+        
+        <hr>
+        <br>
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>

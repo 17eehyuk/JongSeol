@@ -1,0 +1,27 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    레시피보기
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+
+{% for recipe in recipes%}
+<fieldset>
+    <h3><a href="/sharing_read/{{recipe['url']}}/">{{recipe['title']}}</a></h3>
+    작성자 : {{recipe['author']}}<br>
+            {{recipe['time']}}
+
+</fieldset>
+
+
+
+{% endfor %}
+
+
+
+{% endblock %}
+

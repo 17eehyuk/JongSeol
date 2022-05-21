@@ -1,0 +1,57 @@
+{% extends 'frame.html' %}
+
+{% block content %}
+<div>
+    <fieldset>
+        <h3>{{article['title']}}</h3>
+        {{article['author']}}({{article['time']}})<hr>
+
+        <pre style="padding-top: 20px; padding-bottom: 20px;">
+{{article['content']}}
+        </pre>
+        <hr>
+        <form method="post">
+            <input type="password" name="pw" placeholder="비밀번호">
+            <input type="submit" value="글삭제" formaction="/{{article['url']}}/delete">
+        </form>
+    </fieldset>
+</div>
+
+<br><br>
+        
+<div>
+    <fieldset>
+        <h3 style="margin-bottom: 20px;">댓글목록</h3>
+        {% for comment_id, comment_datas in comments.items() %}
+            <fieldset>
+                <p style="float: left; width: 100px; height: 45px; border-right: 1px solid; padding-bottom: 5px; margin-right: 10px;">
+                    {{comment_datas['nickname']}}<br>
+                </p>
+                {{comment_datas['content']}}
+                <span>
+                    {{comment_datas['time']}}
+                    <form method="post">
+                        <input type="hidden" name="comment_id" value="{{comment_id}}">
+                        <input type="password" name="pw" placeholder="비밀번호" required>
+                        <input type="submit" value="댓글삭제" formaction="/{{article['url']}}/comment_delete">
+                    </form>
+                </span>
+            </fieldset>
+        {% endfor %}
+        <form method="post" style="margin-top: 20px;">
+            <h3>새댓글</h3>
+            <p style="float: left; margin-right: 20px;">
+                <input type="text" name="nickname" placeholder="닉네임" required><br>
+                <input type="password" name="pw" placeholder="비밀번호" required>
+            </p>
+            <p style="float: left; margin-right: 20px;">
+                <input type="text" name="content" placeholder="내용(작은따옴표, 큰따옴표, 역슬래시는 삭제됨)" style="width: 630px; height: 70px; resize: none;">
+            </p>
+            <p>
+                <input type="submit" value="저장" formaction="/{{article['url']}}/comment" style="width: 70px; height: 70px;">
+            </p>
+            <br>
+        </form>
+    </fieldset>
+</div>
+{% endblock %}

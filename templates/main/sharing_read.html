@@ -8,11 +8,12 @@
 <!--내용-->
 {% block content %}
 
-<form method="post">
-    <input type="text" name="title" placeholder="글제목" style="width: 600px; height: 50px;" required><br><br>
-    <input type="hidden" name="recipe_name" value="{{ recipe['recipe_name'] }}">
 
+    <h2>{{ recipe['title'] }}</h2>
+    <br>
     <h3>레시피명 : {{ recipe['recipe_name'] }}</h3>
+    <h3>작성자 : {{ recipe['author'] }}</h3>
+    <h3>작성시간 : {{ recipe['share_time'] }}</h3><br>
 <table border="1px">
     <tr>
         <th>음료명</th>
@@ -32,12 +33,13 @@
         {% break %}
         {% endif %}
     {% endfor %}  
-</table> <br>
+</table>
 
-<textarea name="content" placeholder="글설명" style="width: 600px; height: 200px; resize: none;" required></textarea><br>
+<pre style="font-size: 20px; margin-top: 30px; margin-bottom: 30px;">
+{{ recipe['content'] }}
+</pre>
 
-<input type="submit" value="저장" style="width: 100px; height: 50px;" formaction="/sharing_process/{{ recipe['url'] }}/">
-<input type="submit" value="이전으로" style="width: 100px; height: 50px;" formaction="/show_recipe/">
-</form>
+{{ recipe['comments'] }}
+
 
 {% endblock %}
