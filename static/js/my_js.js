@@ -236,9 +236,18 @@ function back(){
   
 }
 
-function comment_delete(only_this){
+function hide_recipe(only_this){
+  if(confirm('글은 비공개만 가능하고 삭제를 원한다면 레시피삭제를 하면됩니다.\n레시피 삭제시 DB에서 삭제되므로 주의하세요.') == true){
+    only_this.form.submit()
+  }
+}
 
+
+function comment_delete(only_this){
   if(confirm('삭제하시겠습니까?') == true){
     only_this.form.submit()
   }
 }
+
+
+    

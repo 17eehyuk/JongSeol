@@ -11,7 +11,7 @@
     <h2>{{ recipe['title'] }}</h2>
     <div style="margin-top: 20px; margin-bottom: 20px;">
         <h3>레시피명 : {{ recipe['recipe_name'] }}</h3>
-        <p style="float: right; border: 1px solid;">
+        <p style="float: right; border: 1px solid; padding: 10px;">
             <b>작성자 : {{ recipe['author'] }}</b><br>
             <b>최종수정 : {{ recipe['share_time'] }}</b>
         </p>
@@ -37,43 +37,54 @@
     {% endfor %}  
 </table>
 
-{% if user_id == recipe['author'] %}
-
-<form method="post">
-    <input type="submit" value="비공개" formaction="/sharing_hide/{{recipe['url']}}/"><br>
-    <p style="color: gray;">
-    글은 비공개만 가능하고 삭제를 원한다면 레시피삭제를 하면됩니다.<br>
-    레시피 삭제시 DB에서 삭제되므로 주의하세요.
-    </p>
-</form>
-
-{% endif %}
 
 
-<pre style="font-size: 20px; margin-top: 30px; margin-bottom: 30px;">
+
+<pre style="font-size: 20px; margin-top: 30px;">
 {{ recipe['content'] }}
 </pre>
 
+<div style="margin-bottom: 30px;">
+    {% if user_id == recipe['author'] %}
+
+<form method="post" action="/sharing_hide/{{recipe['url']}}/">
+    <input type="button" value="비공개" onclick="hide_recipe(this)" style="width: 100px; height: 50px;">
+</form>
+
+{% else %}
+<form method="post">
+    <input type="submit" value="복사하기" formaction="/sharing_copy/{{recipe['url']}}/" style="width: 100px; height: 50px;">
+</form>
+
+{% endif %}
+</div>
 
 
 
-
-<div style="width: 630px; padding-bottom: 50px;">
+<div style="width: 630px; padding-bottom: 50px; margin-top: 30px;">
     <h3 style="margin-bottom: 20px;">댓글목록</h3>
     {% for comment_id, comment_datas in comments.items() %}
         <fieldset style="width: 730px;">
             <p style="margin-right: 20px; float: left; border-right: 1px solid; height: 100%; width: 200px; margin-left: 5px;">
+                
+                {% if comment_datas['id'] == recipe['author'] %}
+                <!-- 글작성자인경우 -->
+                <b>{{comment_datas['id']}} (작성자)</b><br>
+                ({{comment_datas['time']}})
+
+                {% else %}
                 <b>{{comment_datas['id']}}</b><br>
                 ({{comment_datas['time']}})
+                {% endif %}
             </p>
 
             {{comment_datas['content']}}
 
-            {% if user_id == comment_datas['id'] %}
+            {% if comment_datas['id'] == user_id %}
+            <!-- 댓글작성자인경우 -->
             <form method="post" style="float: right; margin: 10px;" action="/delete_comment/{{comment_id}}/">
                 <input type="hidden" name="url" value="{{recipe['url']}}">
                 <input type="button" value="삭제하기" onclick="comment_delete(this)">
-                <!-- <input type="button" value="삭제하기" onclick="if(confirm('삭제하시겠습니까?') == true){this.form.submit()}"> -->
             </form>
             {% endif %}
 
@@ -82,10 +93,10 @@
 
 </div>
 
-<form method="post" style="margin-top: 20px;">
+<form method="post">
     <h3>새댓글</h3>
     <p style="float: left; margin-right: 20px;">
-        <input type="text" name="content" maxlength="25" placeholder="내용(작은따옴표, 큰따옴표, 역슬래시는 삭제됨)" style="width: 630px; height: 70px; resize: none;">
+        <input type="text" name="content" maxlength="25" placeholder="(작은따옴표, 큰따옴표, 역슬래시는 삭제됨, 최대 25글자)" style="width: 630px; height: 70px; resize: none;">
         <input type="submit" value="저장" formaction="/comment/{{recipe['url']}}/" style="width: 70px; height: 70px;">
     </p>
     <br>

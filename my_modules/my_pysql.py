@@ -164,8 +164,8 @@ def new_recipe(id, dic):
     if dup_check(id, tmp_dict['recipe_name']) != None:               # 유효성검사를 한다면 무조건 None이어야되는데 아닌경우이므로 조작한것
         return 'manipulated'
 
-    keys ='id , author, recipe_name, comments, '
-    values = f''' '{tmp_dict['id']}', '{tmp_dict['author']}', '{tmp_dict['recipe_name']}', '{{}}', '''
+    keys ='id , author, recipe_name, '
+    values = f''' '{tmp_dict['id']}', '{tmp_dict['author']}', '{tmp_dict['recipe_name']}', '''
 
 
     for i in range(dic_len):
@@ -378,6 +378,7 @@ def recovery(id):
     return f'''사용자 {id} 복구성공'''
 
 
+# json -> dict
 def fetch_comments(url):
     # 댓글
     mydb = cnn()
@@ -431,6 +432,85 @@ def new_comments(req_dict : dict, url):
     sql_cursor.close()
     mydb.close()
     return '추가완료'
+
+def delete_comment(url, comment_id):
+    comments = fetch_comments(url)
+    for key in comments.keys():
+        if key == comment_id:
+            del comments[comment_id]
+            comments = json.dumps(comments, ensure_ascii=False)  # dict -> json 변환
+            mydb = cnn()
+            sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+            sql_cmd = f'''
+            UPDATE recipes SET comments = '{comments}' WHERE url='{url}';
+            '''
+            sql_cursor.execute(sql_cmd)
+            mydb.commit()
+            sql_cursor.close()
+            mydb.close()
+            return '삭제성공'
+
+
+def show_columns(table_name):
+    mydb = cnn()
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    sql_cmd = f'''
+    SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{table_name}';
+    '''
+    sql_cursor.execute(sql_cmd)
+    mydb.commit()
+    column_names = sql_cursor.fetchall()
+    sql_cursor.close()
+    mydb.close()
+    column_names_list = []
+    for column_name in column_names:
+        column_names_list.append(column_name['COLUMN_NAME'])
+    return column_names_list
+
+
+
+def recipe_count(id):
+    mydb = cnn()
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    sql_cmd = f'''
+    SELECT recipe_name FROM recipes WHERE id='{id}';
+    '''
+    sql_cursor.execute(sql_cmd)
+    mydb.commit()
+    recipe_names = sql_cursor.fetchall()
+    sql_cursor.close()
+    mydb.close()
+    return len(recipe_names)   
+
+
+
+
+def sharing_copy(id, url):
+    # 복사하는 함수
+    if recipe_count(id)<8:
+        # 가져올: copy_url, share, id,       author, recipe_name, drink0, drink0_amount, content
+        # 매칭될: url,       2,    내아이디, author, recipe_name,  drink0, drink0_amount, content 
+        mydb = cnn()
+        sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+        sql_cmd = f'''
+        INSERT INTO recipes
+        (copy_url, share, id, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount)
+        SELECT
+        url, '2', '{id}', author, recipe_name, drink0, drink0_amount, drink1, drink1_amount FROM recipes WHERE url='{url}';
+        '''
+        sql_cursor.execute(sql_cmd)
+        mydb.commit()
+        sql_cursor.close()
+        mydb.close()
+        return '복사완료'
+    else:
+        return '레시피 8개 초과' 
+
+
+
+
+# print(show_columns('recipes'))
+# print(show_recipe_url('16532164050765863'))
 
 
 ############## 더미코드 ################

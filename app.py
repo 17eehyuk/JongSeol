@@ -201,10 +201,13 @@ def sharing_read(url):
 
 @app.route('/sharing_page/', methods=['POST'])
 def sharing_page():
+
+    comments = my_pysql.fetch_comments(request.form['url'])
+
     recipe = my_pysql.show_recipe_url(request.form['url'])
     print(recipe)
     if recipe['share'] == '0': 
-        return render_template('./main/sharing_page.html', login_state=True, user_id=session['session_id'], recipe=recipe)
+        return render_template('./main/sharing_page.html', login_state=True, user_id=session['session_id'], recipe=recipe, comments=comments)
     elif recipe['share'] == '1':
         flash('이미공유중')
     elif recipe['share'] == '2':
@@ -244,14 +247,16 @@ def comment(url):
 @app.route('/delete_comment/<comment_id>/', methods=['post'])
 def delete_comment(comment_id):
     url = request.form['url']
-    # return redirect(f'/sharing_read/{url}/')
-    return('aaa')
-    
+    print(my_pysql.delete_comment(url, comment_id))
+    return redirect(f'/sharing_read/{url}/')
 
 
 
-
-
+@app.route('/sharing_copy/<url>/', methods=['post'])
+def sharing_copy(url):
+    flash(my_pysql.sharing_copy(url, session['session_id']))
+    recipe_dict = my_pysql.show_recipe_url(url)
+    return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict)
 
 
 

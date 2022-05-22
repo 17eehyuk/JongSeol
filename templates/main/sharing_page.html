@@ -43,4 +43,33 @@
 </form>
 
 
+<div style="width: 630px; padding-bottom: 50px; margin-top: 30px;">
+    <h3 style="margin-bottom: 20px;">기존댓글</h3>
+    {% for comment_id, comment_datas in comments.items() %}
+        <fieldset style="width: 730px;">
+            <p style="margin-right: 20px; float: left; border-right: 1px solid; height: 100%; width: 200px; margin-left: 5px;">
+                
+                {% if comment_datas['id'] == recipe['author'] %}
+                <!-- 글작성자인경우 -->
+                <b>{{comment_datas['id']}} (작성자)</b><br>
+                ({{comment_datas['time']}})
+
+                {% else %}
+                <b>{{comment_datas['id']}}</b><br>
+                ({{comment_datas['time']}})
+                {% endif %}
+            </p>
+
+            {{comment_datas['content']}}
+        </fieldset>
+    {% endfor %}
+
+</div>
+
+
+
+
+
+
+
 {% endblock %}
