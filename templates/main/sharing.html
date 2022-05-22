@@ -8,18 +8,22 @@
 <!--내용-->
 {% block content %}
 
+{% if recipes == 'empty' %}
 
-{% for recipe in recipes%}
+{% else %}
+
+{% for recipe in recipes %}
 <fieldset>
     <h3><a href="/sharing_read/{{recipe['url']}}/">{{recipe['title']}}({{recipe['recipe_name']}})</a></h3>
     작성자 : {{recipe['author']}}<br>
-            {{recipe['time']}}
-
+    최종수정 : {{recipe['share_time']}}
 </fieldset>
-
-
-
 {% endfor %}
+
+{% endif %}
+
+
+
 
 
 

@@ -1,35 +1,33 @@
 import pymysql
 import time, datetime
+import json
 
-# # AWS
-# mydb = pymysql.connect(
-#     user='tmp',
-#     database='jongseol',
-#     passwd='1234',
-#     host='3.39.94.57',
-#     charset='utf8'
-# )
-# Local
-mydb = pymysql.connect(
+
+# UPDATE recipes SET rate = rate + 1 WHERE url='{url}';
+
+def cnn():
+    mydb = pymysql.connect(
     user='tmp',
     database='jongseol',
     passwd='1234',
-    host='localhost',
+    host='127.0.0.1',       #Local
+    # host='3.39.94.57',      #AWS
     charset='utf8'
-)
-
-
-
+    )
+    return mydb
 
 #로그인
 def login(id, pw):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     SELECT id, pw FROM users WHERE id = '{id}' AND pw = md5('{pw}') AND state='0';
     '''
     sql_cursor.execute(command)
     result = sql_cursor.fetchone()
+    mydb.commit()
     sql_cursor.close()
+    mydb.close()
     if result == None:
         return '''로그인에 실패했습니다.'''
     else:
@@ -51,7 +49,7 @@ def register(id, pw, sex, yb):
 
     if (id=='admin') or (id=='dbadmin') or not(str(id).isalnum()):      # not(str(id).isalnum()): 특수문자방지
         return '''사용불가능한 id 입니다.'''
-    
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     INSERT INTO users VALUES ('{id}', md5('{pw}'), '{sex}', '{yb}', '0');
@@ -64,12 +62,14 @@ def register(id, pw, sex, yb):
         result = f'''아이디 : {id} 중복입니다. 다른 아이디를 사용해 주세요'''
     
     sql_cursor.close()
+    mydb.close()
     return result
 
 
 
 #회원탈퇴
 def drop_user(id):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     UPDATE users SET state='1' WHERE id = '{id}';
@@ -77,19 +77,23 @@ def drop_user(id):
     sql_cursor.execute(command)
     mydb.commit()
     sql_cursor.close()
+    mydb.close()
     return f'''사용자 {id} 탈퇴 성공'''
 
 
 
 #개인정보확인
 def my_profile(id):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
         SELECT sex, yb FROM users WHERE id='{id}';
     '''
     sql_cursor.execute(command)
     result = sql_cursor.fetchone()
+    mydb.commit()
     sql_cursor.close()
+    mydb.close()
     return result
 
 #개인정보 수정
@@ -105,6 +109,7 @@ def update_profile(sex, yb, pw, id):
             return 'manipulated'
     except:
         return 'manipulated'
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     if pw == '':        
         #비밀번호 변경X
@@ -114,6 +119,7 @@ def update_profile(sex, yb, pw, id):
         sql_cursor.execute(command)
         mydb.commit()
         sql_cursor.close()
+        mydb.close()
         return print('업데이트성공')
     else:
         #비밀번호 까지 변경
@@ -123,18 +129,22 @@ def update_profile(sex, yb, pw, id):
         sql_cursor.execute(command)
         mydb.commit()
         sql_cursor.close()
+        mydb.close()
         return print('업데이트성공')
 
 
 #레시피명 중복인지 확인 (return 값이 None이면 중복 없음, 아닌경우 중복존재)
 def dup_check(id, recipe_name):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     SELECT * FROM recipes WHERE id= '{id}' AND recipe_name='{recipe_name}';
     '''
     sql_cursor.execute(command)
     result = sql_cursor.fetchone()
+    mydb.commit()
     sql_cursor.close()
+    mydb.close()
     return result
 
 
@@ -154,11 +164,8 @@ def new_recipe(id, dic):
     if dup_check(id, tmp_dict['recipe_name']) != None:               # 유효성검사를 한다면 무조건 None이어야되는데 아닌경우이므로 조작한것
         return 'manipulated'
 
-
-    url = str(time.time()).replace('.','0')[:15]
-
-    keys ='url, id , author, recipe_name, '
-    values = f''' '{url}', '{tmp_dict['id']}', '{tmp_dict['author']}', '{tmp_dict['recipe_name']}', '''
+    keys ='id , author, recipe_name, comments, '
+    values = f''' '{tmp_dict['id']}', '{tmp_dict['author']}', '{tmp_dict['recipe_name']}', '{{}}', '''
 
 
     for i in range(dic_len):
@@ -178,7 +185,7 @@ def new_recipe(id, dic):
         values = values + f''' '{tmp_dict[drink]}', '{tmp_dict[drink_amount]}', '''
     keys = keys[:-2]
     values = values[:-2]
-
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     INSERT INTO recipes ({keys}) values  ({values});
@@ -188,18 +195,22 @@ def new_recipe(id, dic):
     sql_cursor.execute(command)
     mydb.commit()
     sql_cursor.close()
+    mydb.close()
 
     return '레시피 추가 성공'
 
 #레시피 목록출력
 def my_recipes(id):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     SELECT recipe_name FROM recipes WHERE id='{id}';
     '''
     sql_cursor.execute(command)
     recipes =  sql_cursor.fetchall()
+    mydb.commit()
     sql_cursor.close()
+    mydb.close()
     result = []
     for recipe in recipes:
         tmp_dict = dict(recipe)     
@@ -211,6 +222,7 @@ def my_recipes(id):
 
 #레시피보기
 def show_detail_recipe(id, recipe_name):
+    mydb = cnn()
     # {'id': 'A', 'author': 'A', 'recipe_name': '물', 'drink0': '물', 'drink0_amount': '200'}
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
@@ -218,11 +230,14 @@ def show_detail_recipe(id, recipe_name):
     '''
     sql_cursor.execute(command)
     result_dict = dict(sql_cursor.fetchone())
+    mydb.commit()
     sql_cursor.close()
+    mydb.close()
     return result_dict
 
 #레시피삭제
 def delete_recipe(id, recipe_name):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     DELETE FROM recipes WHERE id= '{id}' AND recipe_name='{recipe_name}';
@@ -230,29 +245,36 @@ def delete_recipe(id, recipe_name):
     sql_cursor.execute(command)
     mydb.commit()
     sql_cursor.close()
+    mydb.close()
     return '삭제완료'
 
 
 def update_recipe(id, cmd, recipe_name):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     command = f'''
-    UPDATE recipes SET {cmd} WHERE id= '{id}' AND recipe_name='{recipe_name}';
+    UPDATE recipes SET share_time='{now}', {cmd} WHERE id= '{id}' AND recipe_name='{recipe_name}';
     '''
     sql_cursor.execute(command)
     mydb.commit()
     sql_cursor.close()
+    mydb.close()
     return '수정완료'
     #update recipes set drink0_amount=150, drink1_amount=150 WHERE id='A' AND recipe_name='아메리카노';
 
 
 def show_recipe_url(url):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     SELECT * FROM recipes WHERE url = '{url}'
     '''
     sql_cursor.execute(command)
+    mydb.commit()
     result_dict = dict(sql_cursor.fetchone())
     sql_cursor.close()
+    mydb.close()
     return result_dict
 
 
@@ -262,6 +284,7 @@ def show_recipe_url(url):
 
 
 def sharing(url, title, content):
+    mydb = cnn()
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     cmd = f'''
     share='1', share_time='{now}', title='{title}', content='{content}'
@@ -273,22 +296,28 @@ def sharing(url, title, content):
     sql_cursor.execute(command)
     mydb.commit()
     sql_cursor.close()
+    mydb.close()
     return '공유완료'
 
 def show_all_sharings():
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     SELECT * FROM recipes WHERE share='1' ORDER BY share_time DESC;
     '''
     sql_cursor.execute(command)
+    mydb.commit()
     recipes = sql_cursor.fetchall()   # 없는경우는 tuple임    # 있는경우는 list임
     sql_cursor.close()
+    mydb.close()
     if recipes == ():
         recipes = 'empty'
     return recipes
 
 
+
 def sharing_hide(url):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     UPDATE recipes SET share='0' WHERE url= '{url}';
@@ -296,6 +325,7 @@ def sharing_hide(url):
     sql_cursor.execute(command)
     mydb.commit()
     sql_cursor.close()
+    mydb.close()
     return '비공개완료'
 
 
@@ -304,13 +334,16 @@ def sharing_hide(url):
 
 #모든유저출력
 def all_users():
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     SELECT id FROM users;
     '''
     sql_cursor.execute(command)
     tables =  sql_cursor.fetchall()
+    mydb.commit()
     sql_cursor.close()
+    mydb.close()
     users = []
     for table in tables:
         users.append(table['id'])
@@ -318,6 +351,7 @@ def all_users():
 
 #PW초기화(1234로 초기화시킴)    #admin만 가능
 def pw_clear(id):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     #비밀번호 까지 변경
     command = f'''
@@ -326,11 +360,13 @@ def pw_clear(id):
     sql_cursor.execute(command)
     mydb.commit()
     sql_cursor.close()
+    mydb.close()
     return f'''사용자 {id} 비밀번호 초기화 성공(1234)'''
 
 
 # 계정복구
 def recovery(id):
+    mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
     UPDATE users SET state='0' WHERE id = '{id}';
@@ -338,13 +374,63 @@ def recovery(id):
     sql_cursor.execute(command)
     mydb.commit()
     sql_cursor.close()
+    mydb.close()
     return f'''사용자 {id} 복구성공'''
 
 
+def fetch_comments(url):
+    # 댓글
+    mydb = cnn()
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    sql_cmd = f'''
+    SELECT comments FROM recipes WHERE url='{url}';
+    '''
+    sql_cursor.execute(sql_cmd)
+    try:
+        comments = sql_cursor.fetchone()['comments']
+        comments = json.loads(comments)
+    except:
+        comments = {}
+    sql_cursor.close()
+    mydb.close()
+    return comments
+
+# a=fetch_comments('16532049760734386')
+# print(a)
+# print(type(a))
 
 
 
+def new_comments(req_dict : dict, url):
+    # 새댓글
+    comment_id = str(time.time()).replace('.','0')
+    nowDatetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+    old_comments = fetch_comments(url)
+
+    req_dict['time'] = nowDatetime
+    # json은 따옴표 금지
+    req_dict['content'] = req_dict['content'].strip('"')
+    req_dict['content'] = req_dict['content'].strip("'")
+    req_dict['content'] = req_dict['content'].strip('\\')
+
+    new_comment = {comment_id : req_dict}
+
+    # 합치기
+    comments = dict(old_comments, **new_comment)
+    comments = json.dumps(comments, ensure_ascii=False)  # dict -> json 변환
+
+    # SQL
+    mydb = cnn()
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    sql_cmd = f'''
+    UPDATE recipes SET comments = '{comments}' WHERE url='{url}';
+    '''
+    sql_cursor.execute(sql_cmd)
+    mydb.commit()
+    sql_cursor.close()
+    mydb.close()
+    return '추가완료'
 
 
 ############## 더미코드 ################

@@ -214,3 +214,31 @@ function update_modify(){
   $('input[type=number]').attr("readonly",false)
   $('input[type=number]').css("background-color", "#FFFFFF")   //숫자수정색변경
 }
+
+function ban_while_making(){
+  var recipe_form = document.recipe_form;
+
+  if(confirm('정말로 만드시겠습니까?(중간에 취소 불가)\n\n중간에 새로고침 누르지마세요') == true){
+    $('a').removeAttr("href");
+    $('input[type=button]').attr("disabled",true);
+    $('input[type=submit]').attr("disabled",true);
+    recipe_form.submit();
+  }
+  
+}
+
+
+function back(){
+  var sharing_back = document.sharing_back;
+  $('#title').attr("required", false);
+  $('#content').attr("required", false);
+  sharing_back.submit();
+  
+}
+
+function comment_delete(only_this){
+
+  if(confirm('삭제하시겠습니까?') == true){
+    only_this.form.submit()
+  }
+}

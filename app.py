@@ -7,6 +7,7 @@ app = Flask(__name__)
 app.secret_key = "ssijfo@#!@#123"       # session을 사용하기 위해서는 반드시 있어야함
 app.jinja_env.add_extension('jinja2.ext.loopcontrols')      # jinja에서 break 사용가능
 
+############################################################### function ###############################################################
 def local():
     path = "./local.json"
     with open(path, 'r', encoding='utf-8') as json_file:
@@ -47,12 +48,11 @@ def my_serial(cmd):
             break
     return rx_result
 
-
 def manipulated():
     flash('조작감지')
     return render_template('index.html', login_state=True, user_id=session['session_id'])
 
-
+############################################################### home ###############################################################
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # 더미코드
@@ -77,8 +77,6 @@ def managing():
     elif request.method == 'POST':
        return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=local(), nozzle_update=1)
 
-
-
 @app.route('/recipe/', methods=['GET', 'POST'])
 def recipe():
     # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
@@ -91,9 +89,6 @@ def recipe():
     else:
         return render_template('./login/login.html', login_state = False)
         
-
-
-
 @app.route('/new_recipe/', methods=['POST'])
 def new_recipe():
     # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
@@ -102,7 +97,6 @@ def new_recipe():
     except:
         pass
     return render_template('./main/new_recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']))
-
 
 @app.route('/show_recipe/', methods=['POST'])
 def show_recipe():
@@ -127,15 +121,18 @@ def make_recipe():
     recipe_dict = dict(request.form)                # {'recipe_name': '아메리카노', 'drink0': '물', 'drink0_amount': '200', 'drink1': '에스프레소', 'drink1_amount': '25'}
     print(recipe_dict)
     recipe_name = recipe_dict['recipe_name']        # 아메리카노
-    recipe_len = int((len(recipe_dict)-1)/2)        # 2 (레시피 길이 추출)
     nozzles=local()                                 # {'admin_id': 'admin', 'admin_pw': '1251', 'nozzle0': '', 'nozzle1': '', 'nozzle2': '', 'nozzle3': '우유', 'nozzle4': '', 'nozzle5': '', 'nozzle6': '물', 'nozzle7': '에스프레소'}
                              
     cmd = ''
     err = ''
 
-    for i in range(recipe_len):
+    for i in range(8):
         no_nozzle = 1
-        drink = recipe_dict['drink'+str(i)]         # 받은값
+        try:
+            drink = recipe_dict['drink'+str(i)]         # 받은값
+        except:
+            continue
+        
         for j in range(8):
             nozzle = nozzles['nozzle'+str(j)]       # json노즐
             if nozzle==drink:
@@ -162,15 +159,21 @@ def make_recipe():
     
     alert = ''
     print(err[:-2])
-    if err=='':     # 에러가 없는 경우
-        alert = f'''{recipe_name} 제작완료'''
-        serial_result = my_serial(cmd)      # 나중에 보고서 쓸때 주석해놓기
-    else:
-        alert = err[:-2]
-        serial_result = ''
 
+    try:
+        my_serial(cmd)
+        if err=='':     # 에러가 없는 경우
+            alert = f'''{recipe_name} 제작완료'''
+        else:
+            alert = err[:-2]    
+    except:
+        alert = '사용할수 없는 상태'
+
+    
+    recipe_dict = my_pysql.show_recipe_url(recipe_dict['url'])      # 조금 조잡하긴한데 옛날코드와 호환이 달라서 재갱신 코드가 필요
     flash(alert)
-    return render_template('./main/recipe.html', login_state=True, user_id=session['session_id'], recipes=my_pysql.my_recipes(session['session_id']), serial_result=serial_result)
+    return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict)
+
 
 
 @app.route('/sharing/')
@@ -184,9 +187,13 @@ def sharing_home():
 
 @app.route('/sharing_read/<url>/', methods=['GET','POST'])
 def sharing_read(url):
+
+    comments = my_pysql.fetch_comments(url)
+
+
     recipe = my_pysql.show_recipe_url(url)
     if 'session_id' in session:
-        return render_template('./main/sharing_read.html', login_state=True, user_id=session['session_id'], recipe=recipe)
+        return render_template('./main/sharing_read.html', login_state=True, user_id=session['session_id'], recipe=recipe, comments=comments)
     else:
         return render_template('./login/login.html', login_state = False)
 
@@ -220,6 +227,54 @@ def sharing_process(url):
     flash(my_pysql.sharing(url, title, content))
     return redirect(f'/sharing_read/{url}/')
 
+
+
+
+@app.route('/comment/<url>/', methods=['post'])
+def comment(url):
+    req_dict = dict(request.form)
+    if len(req_dict['content'])>25:
+        flash('글자수초과')
+    else:
+        req_dict['id'] = session['session_id']          # 댓글에 id 추가
+        print(my_pysql.new_comments(req_dict,url))
+    return redirect(f'/sharing_read/{url}/')
+
+
+@app.route('/delete_comment/<comment_id>/', methods=['post'])
+def delete_comment(comment_id):
+    url = request.form['url']
+    # return redirect(f'/sharing_read/{url}/')
+    return('aaa')
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ############################################################### main_processes ###############################################################
 @app.route('/managing_process/', methods=['POST'])
 def managing_process():
@@ -246,20 +301,25 @@ def delete_recipe_process():
     return redirect('/recipe/')
 
 
-
 @app.route('/update_recipe_process/', methods=['POST'])
 def update_recipe_process():
     # {'recipe_name': '아메리카노', 'drink0': '물', 'drink0_amount': '200', 'drink1': '에스프레소', 'drink1_amount': '25'}
     req_dict= dict(request.form)
+    print(req_dict)
+
     recipe_name = req_dict['recipe_name']
-    amounts = int((len(req_dict)-1)/2)
     new_recipe_name = req_dict['new_recipe_name']
-    print(new_recipe_name)
+
+
     cmd = f'''recipe_name='{new_recipe_name}', '''
-    for i in range(amounts):
-        drink_amount = 'drink' + str(i) +'_amount'
-        drink_amount_num = req_dict[drink_amount]
-        cmd = cmd + f'''{drink_amount}='{drink_amount_num}', '''
+    for i in range(8):
+        try:
+            drink_amount = 'drink' + str(i) +'_amount'
+            drink_amount_num = req_dict[drink_amount]
+            cmd = cmd + f'''{drink_amount}='{drink_amount_num}', '''
+        except:
+            # 노즐이 없는경우 오류가 발생하는데 그러면 break를 통해서 for문 탈출
+            break
 
     cmd = cmd[:-2]
     flash(my_pysql.update_recipe(session['session_id'], cmd, recipe_name))

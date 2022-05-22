@@ -32,7 +32,7 @@
 
     
     {% set leng = 0 %}
-    {% for i in range(4) %}
+    {% for i in sql_drink_count %}
 
         {% set drink = 'drink'+(i|string) %}
         {% set drink_amount = drink+'_amount' %}
@@ -53,11 +53,11 @@
 </table>   
 
 
-
+<input type="submit" value="이전으로" formaction="/show_recipe/">
 <input type="button" id="update_dect_btn" onclick="update_dect()" value="유효성검사">
 <input type="button" id="modify_btn" value="수정하기" onclick="update_modify()" disabled>
 <input type="submit" id="update_btn" formaction="/update_recipe_process/" value="저장하기" disabled>
-<input type="submit" value="이전으로" formaction="/show_recipe/">
+
 
 </form>
 
