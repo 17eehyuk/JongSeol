@@ -12,10 +12,11 @@
 {% set leng = (((recipe_dict|length)-3)/2)|int %}  {# -3: id,author,recipe_name #}           {# /2: drink,drink_amount #}
 
 <h2>{{ recipe_dict['recipe_name'] }} (작성자 : {{ recipe_dict['author'] }})</h2>
-레시피명 중복 불가, 각 음료는 600이하, 모든 음료양의 합은 700이하<br>
+
+<p style="margin-top: 20px; margin-bottom: 20px;">
+    레시피명 중복 불가, 각 음료는 600이하, 모든 음료양의 합은 700이하<br>
 레시피명은 영어, 한글, 숫자만 가능
-<br>
-<br>
+</p>
 
 <div id="existing_recipe" hidden>{% for recipe in recipes %}{{ recipe }},{% endfor %}</div> {# 기존레시피 #}
 
@@ -23,7 +24,7 @@
 레시피명 변경
 <input type="hidden" id="old_recipe_name" name="recipe_name" value="{{ recipe_dict['recipe_name'] }}">
 <input type="text" id="new_recipe_name" name="new_recipe_name" value="{{ recipe_dict['recipe_name'] }}">
-<table border="1px">
+<table border="1px" style="margin-top: 20px; margin-bottom: 20px;">
     <tr>
         <th>음료명</th>
         <th>음료양</th>

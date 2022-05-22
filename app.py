@@ -77,16 +77,6 @@ def managing():
     elif request.method == 'POST':
        return render_template('./main/managing.html', login_state=True, user_id=session['session_id'], nozzles=local(), nozzle_update=1)
 
-@app.route('/making/', methods=['GET', 'POST'])
-def making():
-    if request.method == 'GET':
-        if 'session_id' in session:
-            return render_template('./main/making.html', login_state=True, user_id=session['session_id'])
-        else:
-            return render_template('./login/login.html', login_state = False)
-    elif request.method == 'POST':
-       return render_template('./main/making.html', login_state=True, user_id=session['session_id'])
-
 
 
 @app.route('/recipe/', methods=['GET', 'POST'])
@@ -206,16 +196,28 @@ def sharing_read(url):
 def sharing_page():
     recipe = my_pysql.show_recipe_url(request.form['url'])
     print(recipe)
-    if recipe['share'] == '1':
+    if recipe['share'] == '0': 
+        return render_template('./main/sharing_page.html', login_state=True, user_id=session['session_id'], recipe=recipe)
+    elif recipe['share'] == '1':
         flash('이미공유중')
-        return redirect(f'''/sharing_read/{recipe['url']}/''')
-    return render_template('./main/sharing_page.html', login_state=True, user_id=session['session_id'], recipe=recipe)
+    elif recipe['share'] == '2':
+        flash('타인의 레시피는 공개불가')
+    return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe)
+    
+
+@app.route('/sharing_hide/<url>/', methods=['POST'])
+def sharing_hide(url):
+    flash(my_pysql.sharing_hide(url))
+    recipe_dict = my_pysql.show_recipe_url(url)
+    return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict)
+
+
 
 @app.route('/sharing_process/<url>/', methods=['POST'])
 def sharing_process(url):    
     title = request.form['title']
     content = request.form['content']
-    my_pysql.sharing(url, title, content)
+    flash(my_pysql.sharing(url, title, content))
     return redirect(f'/sharing_read/{url}/')
 
 ############################################################### main_processes ###############################################################
@@ -232,14 +234,15 @@ def managing_process():
 
 @app.route('/new_recipe_process/', methods=['POST'])
 def new_recipe_process():
-    if(my_pysql.new_recipe(session['session_id'],request.form)=='manipulated'):
+    result = my_pysql.new_recipe(session['session_id'],request.form)
+    if(result=='manipulated'):
         return manipulated()
-    flash('추가완료')
+    flash(result)
     return redirect('/recipe/')
 
 @app.route('/delete_recipe_process/', methods=['POST'])
 def delete_recipe_process():
-    my_pysql.delete_recipe(session['session_id'], request.form['recipe_name'])
+    flash(my_pysql.delete_recipe(session['session_id'], request.form['recipe_name']))
     return redirect('/recipe/')
 
 
@@ -259,7 +262,7 @@ def update_recipe_process():
         cmd = cmd + f'''{drink_amount}='{drink_amount_num}', '''
 
     cmd = cmd[:-2]
-    my_pysql.update_recipe(session['session_id'], cmd, recipe_name)
+    flash(my_pysql.update_recipe(session['session_id'], cmd, recipe_name))
 
     return redirect('/recipe/')
 
@@ -330,8 +333,10 @@ def register_process():
     user_pw = request.form['user_pw']
     user_sex = request.form['user_sex']
     user_yb = request.form['user_yb']
-    sql_message = my_pysql.register(user_id, user_pw, user_sex, user_yb)      # return값을 반환하기 때문('이미 존재하는 회원', '회원가입 완료')
-    flash(sql_message)
+    result = my_pysql.register(user_id, user_pw, user_sex, user_yb)      # return값을 반환하기 때문('이미 존재하는 회원', '회원가입 완료')
+    if result == 'manipulated':
+        result = '조작감지'
+    flash(result)
     return redirect('/')
 
 @app.route('/drop_process/', methods=['post'])

@@ -10,9 +10,8 @@
 
 <h2>레시피</h2>
 최대 8개까지 추가가능
-<br>
-<br>
-<form method="post">
+
+<form method="post" style="margin-top: 20px; margin-bottom: 20px;">
     <select id="recipe_name" name="recipe_name">
         {% for recipe in recipes %}
         <option>{{ recipe }}</option>

@@ -38,15 +38,15 @@ def login(id, pw):
 def register(id, pw, sex, yb):
 
     if not((sex=='M')or(sex=='F')):
-        return '조작감지' #'manipulated'
+        return 'manipulated' 
 
     try:
         yb = int(yb)
         adult_year = datetime.datetime.now().year -18
         if not((yb>=1900) and (yb<=adult_year)):
-            return '조작감지' #'manipulated'
+            return 'manipulated'
     except:
-        return '조작감지' #'manipulated'
+        return 'manipulated'
 
 
     if (id=='admin') or (id=='dbadmin') or not(str(id).isalnum()):      # not(str(id).isalnum()): 특수문자방지
@@ -189,7 +189,7 @@ def new_recipe(id, dic):
     mydb.commit()
     sql_cursor.close()
 
-    return print('레시피 추가 성공')
+    return '레시피 추가 성공'
 
 #레시피 목록출력
 def my_recipes(id):
@@ -230,7 +230,7 @@ def delete_recipe(id, recipe_name):
     sql_cursor.execute(command)
     mydb.commit()
     sql_cursor.close()
-    return print('삭제완료')
+    return '삭제완료'
 
 
 def update_recipe(id, cmd, recipe_name):
@@ -241,7 +241,7 @@ def update_recipe(id, cmd, recipe_name):
     sql_cursor.execute(command)
     mydb.commit()
     sql_cursor.close()
-    return print('수정완료')
+    return '수정완료'
     #update recipes set drink0_amount=150, drink1_amount=150 WHERE id='A' AND recipe_name='아메리카노';
 
 
@@ -271,8 +271,9 @@ def sharing(url, title, content):
     UPDATE recipes SET {cmd} WHERE url= '{url}';
     '''
     sql_cursor.execute(command)
+    mydb.commit()
     sql_cursor.close()
-    return print('공유완료')
+    return '공유완료'
 
 def show_all_sharings():
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
@@ -285,6 +286,17 @@ def show_all_sharings():
     if recipes == ():
         recipes = 'empty'
     return recipes
+
+
+def sharing_hide(url):
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    command = f'''
+    UPDATE recipes SET share='0' WHERE url= '{url}';
+    '''
+    sql_cursor.execute(command)
+    mydb.commit()
+    sql_cursor.close()
+    return '비공개완료'
 
 
 ############## 관리자 ################

@@ -11,7 +11,7 @@
 
 {% for recipe in recipes%}
 <fieldset>
-    <h3><a href="/sharing_read/{{recipe['url']}}/">{{recipe['title']}}</a></h3>
+    <h3><a href="/sharing_read/{{recipe['url']}}/">{{recipe['title']}}({{recipe['recipe_name']}})</a></h3>
     작성자 : {{recipe['author']}}<br>
             {{recipe['time']}}
 

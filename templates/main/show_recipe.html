@@ -21,12 +21,12 @@
 {% endif %}
 
 
-<br>
-<form method="post">
+
+<form method="post" >
 <input type="hidden" name="recipe_name" value="{{ recipe_dict['recipe_name'] }}">
 <input type="hidden" name="url" value="{{ recipe_dict['url'] }}">
 
-<table border="1px">
+<table border="1px" style="margin-top: 20px; margin-bottom: 20px;">
     <tr>
         <th>음료명</th>
         <th>음료양</th>
@@ -50,12 +50,20 @@
         
 </table>   
 
-<br>
+
 
 <input type="submit" formaction="/make_recipe/" value="만들기">
+<input type="submit" value="이전으로" formaction="/recipe/">
+
+{% if recipe_dict['share'] == '0' %}
 <input type="submit" formaction="/sharing_page/" value="공유하기">
+{% else %}
+<input type="submit" formaction="/sharing_page/" value="공유하기" disabled>
+{% endif %}
+
 <input type="submit" formaction="/update_recipe/" value="수정하기">
 <input type="submit" formaction="/delete_recipe/" value="삭제하기">
+
 </form>
 
 

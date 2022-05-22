@@ -13,7 +13,7 @@
 <form id="register" method="post">
     <table>
         <tr>
-            <th width="100">ID</th>
+            <th width="100px">ID</th>
             <td><input maxlength="10" name="user_id" type="text" value="" placeholder="아이디" required></td>
         </tr>
         <tr>
@@ -21,20 +21,14 @@
             <td><input maxlength="10" name="user_pw" type="password" value="" placeholder="비밀번호" required></td>
         </tr>
         <tr>
-            <th width="100">성별</th>
-            <td>
-                <ul id="user_sex">
-                    <li><input checked="" id="man" name="user_sex" type="radio" value="M">
-                        <label for="man">남자</label>
-                    </li>
-                    <li><input id="woman" name="user_sex" type="radio" value="F">
-                        <label for="woman">여자</label>
-                    </li>
-                </ul>
+            <th width="100px">성별</th>
+            <td style="text-align: left;">
+                <input checked="" id="user_sex-0" name="user_sex" type="radio" value="M" > <span style="margin-left: 5px; margin-right: 5px;">남자</span>
+                <input id="user_sex-1" name="user_sex" type="radio" value="F"><span style="margin-left: 5px; margin-right: 5px;">여자</span>
             </td>
         </tr>
         <tr>
-            <th width="100">태어난해</th>
+            <th width="100px">태어난해</th>
             <td><input id="user_yb" max="2004" min="1900" name="user_yb" required="" type="number" value="2004" oninput="num_only(this); NO_kid(this);"></td>
         </tr>
     </table>

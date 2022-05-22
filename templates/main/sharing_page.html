@@ -9,7 +9,7 @@
 {% block content %}
 
 <form method="post">
-    <input type="text" name="title" placeholder="글제목" style="width: 600px; height: 50px;" required><br><br>
+    <input type="text" name="title" placeholder="글제목" value="{{ recipe['title'] }}" style="width: 600px; height: 50px;" required><br><br>
     <input type="hidden" name="recipe_name" value="{{ recipe['recipe_name'] }}">
 
     <h3>레시피명 : {{ recipe['recipe_name'] }}</h3>
@@ -34,7 +34,7 @@
     {% endfor %}  
 </table> <br>
 
-<textarea name="content" placeholder="글설명" style="width: 600px; height: 200px; resize: none;" required></textarea><br>
+<textarea name="content" placeholder="글설명" style="width: 600px; height: 200px; resize: none;" required>{{ recipe['content'] }}</textarea><br>
 
 <input type="submit" value="저장" style="width: 100px; height: 50px;" formaction="/sharing_process/{{ recipe['url'] }}/">
 <input type="submit" value="이전으로" style="width: 100px; height: 50px;" formaction="/show_recipe/">

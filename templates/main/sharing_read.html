@@ -10,11 +10,12 @@
 
 
     <h2>{{ recipe['title'] }}</h2>
-    <br>
-    <h3>레시피명 : {{ recipe['recipe_name'] }}</h3>
-    <h3>작성자 : {{ recipe['author'] }}</h3>
-    <h3>작성시간 : {{ recipe['share_time'] }}</h3><br>
-<table border="1px">
+    <p style="margin-top: 20px; margin-bottom: 20px;">
+        <h3>레시피명 : {{ recipe['recipe_name'] }}</h3>
+        <h3>작성자 : {{ recipe['author'] }}</h3>
+        <h3>작성시간 : {{ recipe['share_time'] }}</h3>
+    </p>
+<table border="1px" style="margin-top: 20px; margin-bottom: 20px;">
     <tr>
         <th>음료명</th>
         <th>음료양</th>
@@ -34,6 +35,14 @@
         {% endif %}
     {% endfor %}  
 </table>
+
+{% if user_id == recipe['author'] %}
+<form method="post">
+    <input type="submit" value="비공개" formaction="/sharing_hide/{{recipe['url']}}/">
+</form>
+
+{% endif %}
+
 
 <pre style="font-size: 20px; margin-top: 30px; margin-bottom: 30px;">
 {{ recipe['content'] }}

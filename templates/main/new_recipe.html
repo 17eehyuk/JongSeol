@@ -8,24 +8,20 @@
 <!--내용-->
 {% block content %}
 
-<h2>새 레시피</h2>
-레시피명, 음료이름(재료) 중복불가, 각 음료는 600이하, 모든 음료양의 합은 700이하, 행은 최대 8개<br>
-레시피명은 영어, 한글, 숫자만 가능, 음료이름(재료)는 한글만 가능
-<br>
-<br>
-<div id="existing_recipe" hidden>{% for recipe in recipes %}{{ recipe }},{% endfor %}</div>
-    
-    
-    
-
 
 <form method="post">
+    <h2>새 레시피</h2>
+    <p style="margin-top: 20px; margin-bottom: 20px;">
+        레시피명, 음료이름(재료) 중복불가, 각 음료는 600이하, 모든 음료양의 합은 700이하, 행은 최대 8개<br>
+        레시피명은 영어, 한글, 숫자만 가능, 음료이름(재료)는 한글만 가능 
+    </p>
+
+    <input type="text" id="recipe_name" name="recipe_name" placeholder="레시피이름" style="width: 300px; height: 30px;">
     <input type="hidden" id="id" name="id" value="{{user_id}}">
     <input type="hidden" id="author" name="author" value="{{user_id}}">
     <input type="hidden" id="row_count" value="1" disabled>  <!-- 행개수 -->
-    <input type="text" id="recipe_name" name="recipe_name" placeholder="레시피이름">
 
-    <table border="1">
+    <table border="1" style="margin-top: 20px; margin-bottom: 20px;">
         <tbody id='recipe'>
             <tr>
                 <th>음료명</th>
@@ -43,5 +39,7 @@
     <input type="button" id="recipe_update_btn" onclick="recipe_update()" value="수정하기" disabled>
     <input type="submit" id="save_btn" value="저장하기" disabled formaction="/new_recipe_process/">
 </form>
+
+<div id="existing_recipe" hidden>{% for recipe in recipes %}{{ recipe }},{% endfor %}</div>
 
 {% endblock %}

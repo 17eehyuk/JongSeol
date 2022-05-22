@@ -11,9 +11,8 @@
 
 {% if nozzle_update == 0 %}
 <h2>이 기기의 노즐정보</h2>
-<br>
 <form method="post">
-    <table border="1px">
+    <table border="1px" style="margin-top: 20px; margin-bottom: 20px;">
         <tr>
             <th width="80px">노즐번호</th>
             <th width="200px">음료</th>
@@ -32,12 +31,10 @@
 </form>
 
 {% if user_id != 'admin' %}
-<br>
-<h2>계정</h2>
-<br>
 
+<h2>계정</h2>
     
-<table border="1px">
+<table border="1px" style="margin-top: 20px; margin-bottom: 20px;">
     <tr>
         <th width="100px">성별</th>
         <th width="100px">태어난해</th>
@@ -66,7 +63,7 @@
 {% elif nozzle_update == 1 %}
 <h2>노즐수정</h2>
 <form method="post">
-    <table border="1px">
+    <table border="1px" style="margin-top: 20px; margin-bottom: 20px;">
         <tr>
             <th width="80px">노즐번호</th>
             <th width="200px">음료</th>
