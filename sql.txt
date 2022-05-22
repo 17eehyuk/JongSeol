@@ -34,6 +34,42 @@ state CHAR(1) NOT NULL
 INSERT INTO users VALUES ('dbadmin', md5('1234'), 'A', '9999', '0');
 
 
+
+
+DROP TABLE recipes;
+SELECT * FROM recipes;
+
+
+
+
+
+
+#recipes(AWS)
+# url: 주소, share: 공개여부, time: 레시피저장시간, share_time: 최종수정시간, title: 글제목, rate: 추천수, id: 저장위치, author: 작성자, recipe_name: 레시피명, content: 글내용, comments: 댓글
+CREATE TABLE recipes(
+url VARCHAR(17) NOT NULL DEFAULT '',
+copy_url VARCHAR(17) NOT NULL DEFAULT '',
+share CHAR(1) NOT NULL DEFAULT '0',
+time timestamp NOT NULL DEFAULT now(),
+share_time timestamp NOT NULL DEFAULT now(),
+title VARCHAR(20) NOT NULL DEFAULT '',
+rate SMALLINT NOT NULL DEFAULT 0,
+id VARCHAR(10) NOT NULL,
+author VARCHAR(10) NOT NULL,
+recipe_name VARCHAR(10) NOT NULL,
+drink0 VARCHAR(10),
+drink0_amount CHAR(4),
+drink1 VARCHAR(10),
+drink1_amount CHAR(4),
+content VARCHAR(200) NOT NULL DEFAULT '',
+comments JSON
+);
+
+
+
+
+
+
 #recipes(초간략화)
 # url: 주소, share: 공개여부, time: 레시피저장시간, share_time: 최종수정시간, title: 글제목, rate: 추천수, id: 저장위치, author: 작성자, recipe_name: 레시피명, content: 글내용, comments: 댓글
 CREATE TABLE recipes(
@@ -48,23 +84,21 @@ id VARCHAR(10) NOT NULL,
 author VARCHAR(10) NOT NULL,
 recipe_name VARCHAR(10) NOT NULL,
 drink0 VARCHAR(10),
-drink0_amount CHAR(3),
+drink0_amount CHAR(4),
 drink1 VARCHAR(10),
-drink1_amount CHAR(3),
+drink1_amount CHAR(4),
 content VARCHAR(200) NOT NULL DEFAULT '',
 comments JSON NOT NULL DEFAULT '{}'
 );
 
 
-DROP TABLE recipes;
-SELECT * FROM recipes;
 
 
 
-복사
-id = 내아이디
-author = 작성자
-recipe_name 가져오기
+
+
+
+
 
 
 

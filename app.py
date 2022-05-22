@@ -254,9 +254,9 @@ def delete_comment(comment_id):
 
 @app.route('/sharing_copy/<url>/', methods=['post'])
 def sharing_copy(url):
-    flash(my_pysql.sharing_copy(url, session['session_id']))
-    recipe_dict = my_pysql.show_recipe_url(url)
-    return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict)
+    flash(my_pysql.sharing_copy(session['session_id'], url))
+    return redirect(f'/sharing_read/{url}/')
+
 
 
 

@@ -164,8 +164,8 @@ def new_recipe(id, dic):
     if dup_check(id, tmp_dict['recipe_name']) != None:               # 유효성검사를 한다면 무조건 None이어야되는데 아닌경우이므로 조작한것
         return 'manipulated'
 
-    keys ='url, id , author, recipe_name, comments, '
-    values = f''' replace(unix_timestamp(now(6)), '.','0'), '{tmp_dict['id']}', '{tmp_dict['author']}', '{tmp_dict['recipe_name']}', '{{}}', '''
+    keys ='id , author, recipe_name, '
+    values = f''' '{tmp_dict['id']}', '{tmp_dict['author']}', '{tmp_dict['recipe_name']}', '''
 
 
     for i in range(dic_len):
@@ -485,62 +485,26 @@ def recipe_count(id):
 
 
 
-# def sharing_copy(id, url):
-#     # 복사하는 함수
-#     if recipe_count(id)<8:
-#         # 가져올: copy_url, share, id,       author, recipe_name, drink0, drink0_amount, content
-#         # 매칭될: url,       2,    내아이디, author, recipe_name,  drink0, drink0_amount, content 
-#         mydb = cnn()
-#         sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
-#         sql_cmd = f'''
-#         INSERT INTO recipes (copy_url, share, id, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount)
-#         SELECT url, '2', '{id}', author, recipe_name, drink0, drink0_amount, drink1, drink1_amount FROM recipes WHERE url='{url}';
-#         '''
-#         sql_cursor.execute(sql_cmd)
-#         mydb.commit()
-#         sql_cursor.close()
-#         mydb.close()
-#         return '복사완료'
-#     else:
-#         return '레시피 8개 초과' 
-
-
-
-
-def fetch_copied(url):
-    mydb = cnn()
-    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
-    sql_cmd = f'''
-    SELECT url, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount FROM recipes WHERE url='{url}';
-    '''
-    sql_cursor.execute(sql_cmd)
-    mydb.commit()
-    copied = sql_cursor.fetchone()
-    sql_cursor.close()
-    mydb.close()
-    return copied
-
-# INSERT INTO recipes (url, id , author, recipe_name, comments, drink0, drink0_amount) values  ( replace(unix_timestamp(now(6)), '.','0'), 'a', 'a', '물', '{}',  '물', '600');
-    
 def sharing_copy(id, url):
-    copied_data = fetch_copied(url)
-    mydb = cnn()
-    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
-    sql_cmd = f'''
-    INSERT INTO recipes (copy_url, share, id, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount)
-    VALUES ('{copied_data['url']}', '2', '{id}', '{copied_data['author']}', '{copied_data['recipe_name']}',
-    '{copied_data['drink0']}', '{copied_data['drink0_amount']}',
-    '{copied_data['drink1']}', '{copied_data['drink1_amount']}');
-    '''
-    print(sql_cmd)
-    sql_cursor.execute(sql_cmd)
-    mydb.commit()
-    sql_cursor.close()
-    mydb.close()
-    return '복사완료'
+    # 복사하는 함수
+    if recipe_count(id)<8:
+        # 가져올: copy_url, share, id,       author, recipe_name, drink0, drink0_amount, content
+        # 매칭될: url,       2,    내아이디, author, recipe_name,  drink0, drink0_amount, content 
+        mydb = cnn()
+        sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+        sql_cmd = f'''
+        INSERT INTO recipes (copy_url, share, id, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount)
+        SELECT url, '2', '{id}', author, recipe_name, drink0, drink0_amount, drink1, drink1_amount FROM recipes WHERE url='{url}';
+        '''
+        sql_cursor.execute(sql_cmd)
+        mydb.commit()
+        sql_cursor.close()
+        mydb.close()
+        return '복사완료'
+    else:
+        return '레시피 8개 초과' 
 
 
-# sharing_copy('gd', '16532303070759508')
 
 
 # print(show_columns('recipes'))

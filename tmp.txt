@@ -1,0 +1,36 @@
+INSERT INTO 저장할테이블
+SELECT 복사당할열 FROM 가져올위치
+
+
+INSERT INTO recipes SELECT 
+
+
+
+
+
+ FROM url='16532164050765863';
+
+
+INSERT INTO recipes (copy_url, id, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount) SELECT url, 's', author, recipe_name, drink0, drink0_amount, drink1, drink1_amount FROM recipes WHERE url='16532243380595186';
+
+
+
+
+
+SELECT drink0, drink0_amount, drink1, drink1_amount FROM recipes WHERE url='16532243380595186';
+
+
+
+INSERT INTO recipes
+
+
+
+
+
+
+
+INSERT INTO recipes
+(copy_url, share, id, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount, content)
+SELECT
+url, '2', 's', author, recipe_name, drink0, drink0_amount, drink1, drink1_amount, content FROM recipes WHERE url='16532254770490678';
+'''
