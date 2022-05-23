@@ -1,3 +1,4 @@
+from unittest import result
 import pymysql
 import time, datetime
 import json
@@ -10,8 +11,8 @@ def cnn():
     user='tmp',
     database='jongseol',
     passwd='1234',
-    #host='127.0.0.1',       #Local
-    host='3.39.94.57',      #AWS
+    host='127.0.0.1',       #Local
+    # host='3.39.94.57',      #AWS
     charset='utf8'
     )
     return mydb
@@ -36,8 +37,7 @@ def login(id, pw):
 def register(id, pw, sex, yb):
 
     if not((sex=='M')or(sex=='F')):
-        return 'manipulated' 
-
+        return 'manipulated'
     try:
         yb = int(yb)
         adult_year = datetime.datetime.now().year -18
@@ -150,23 +150,29 @@ def dup_check(id, recipe_name):
 
 #새로운 레시피 생성
 def new_recipe(id, dic):
-    tmp_dict = dict(dic)                     # {'id': 'a', 'author': 'a', 'recipe_name': '물', 'drink0': '물', 'drink0_amount': '200'}
-    dic_len = int((len(tmp_dict) - 3)/2)     # id, author, recipe_name
+    tmp_dict = dict(dic)                     # {'recipe_name': '아메리카노', 'drink0': '물', 'drink0_amount': '600', 'drink1': '에스프레소', 'drink1_amount': '100'}
+    print(tmp_dict)
+
+
+    # 레시피명과 0번은 공백이 될 수 가 없음, 오류역시 말도안됨
+    try:
+        if ((tmp_dict['recipe_name']=='') or (tmp_dict['drink0'] == '') or (tmp_dict['drink0_amount'] == '')):
+            return 'manipulated'
+    except:
+        return 'manipulated'
+
+    
+    dic_len = int((len(tmp_dict) - 1)/2)     # -1: recipe_name
 
     if (dic_len<1) or (dic_len>8):       # 행이 하나도 없다는 의미, 행을 많이 추가한 경우
         return 'manipulated'
-    try:
-        if (id != tmp_dict['id'] or id != tmp_dict['author']):        # 새 레시피이기 때문에 반드시 id와 author가 같아야됨
-            return 'manipulated'
-    except:
-        return 'manipulated'                                          # 오류가 날 수가 없는데 오류가 난 경우이므로 무조건 조작
+   
 
-    if dup_check(id, tmp_dict['recipe_name']) != None:               # 유효성검사를 한다면 무조건 None이어야되는데 아닌경우이므로 조작한것
-        return 'manipulated'
-
+    # 새 레시피이기 때문에 무조건 id==author
     keys ='url, id , author, recipe_name, comments, '
-    values = f''' replace(unix_timestamp(now(6)), '.','0'), '{tmp_dict['id']}', '{tmp_dict['author']}', '{tmp_dict['recipe_name']}', '{{}}', '''
+    values = f''' replace(unix_timestamp(now(6)), '.','0'), '{id}', '{id}', '{tmp_dict['recipe_name']}', '{{}}', '''
 
+    total_amout = 0
 
     for i in range(dic_len):
         drink = 'drink' + str(i)                # drink0
@@ -176,13 +182,20 @@ def new_recipe(id, dic):
 
         try:
             amount = int(tmp_dict[drink_amount])
-            if not((amount >= 0) and (amount <= 600)):
+            if not((amount > 0) and (amount <= 600)):
                 return 'manipulated'
+
+            total_amout = total_amout + amount
+            
+            if total_amout>700:
+                return 'manipulated'
+
         except:
-            return 'manipulated'       # 숫자로 안바뀐다는 의미 따라서 조작
-
-
+            # int()가 안된다는 의미 따라서 무조건 조작
+            return 'manipulated'       
         values = values + f''' '{tmp_dict[drink]}', '{tmp_dict[drink_amount]}', '''
+
+
     keys = keys[:-2]
     values = values[:-2]
     mydb = cnn()
@@ -204,29 +217,23 @@ def my_recipes(id):
     mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
-    SELECT recipe_name FROM recipes WHERE id='{id}';
+    SELECT url, time, author, recipe_name FROM recipes WHERE id='{id}';
     '''
     sql_cursor.execute(command)
     recipes =  sql_cursor.fetchall()
     mydb.commit()
     sql_cursor.close()
     mydb.close()
-    result = []
-    for recipe in recipes:
-        tmp_dict = dict(recipe)     
-        tmp_list = list(tmp_dict.values())      # ['아메리카노', 'A']
-        recipe_name = tmp_list[0]
-        result.append(recipe_name)
-    return result
+    return recipes
 
 
 #레시피보기
-def show_detail_recipe(id, recipe_name):
+def show_detail_recipe(id, url):
     mydb = cnn()
     # {'id': 'A', 'author': 'A', 'recipe_name': '물', 'drink0': '물', 'drink0_amount': '200'}
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
-    SELECT * FROM recipes WHERE id= '{id}' AND recipe_name='{recipe_name}';
+    SELECT * FROM recipes WHERE id= '{id}' AND url='{url}';
     '''
     sql_cursor.execute(command)
     result_dict = dict(sql_cursor.fetchone())
@@ -249,12 +256,12 @@ def delete_recipe(id, recipe_name):
     return '삭제완료'
 
 
-def update_recipe(id, cmd, recipe_name):
+def update_recipe(cmd, url):
     mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     command = f'''
-    UPDATE recipes SET share_time='{now}', {cmd} WHERE id= '{id}' AND recipe_name='{recipe_name}';
+    UPDATE recipes SET share_time='{now}', {cmd} WHERE url='{url}';
     '''
     sql_cursor.execute(command)
     mydb.commit()
@@ -272,7 +279,10 @@ def show_recipe_url(url):
     '''
     sql_cursor.execute(command)
     mydb.commit()
-    result_dict = dict(sql_cursor.fetchone())
+    result_dict = sql_cursor.fetchone()
+    # 없는경우 None
+    if result_dict != None:
+        result_dict = dict(result_dict)
     sql_cursor.close()
     mydb.close()
     return result_dict
@@ -485,59 +495,75 @@ def recipe_count(id):
 
 
 
-# def sharing_copy(id, url):
-#     # 복사하는 함수
-#     if recipe_count(id)<8:
-#         # 가져올: copy_url, share, id,       author, recipe_name, drink0, drink0_amount, content
-#         # 매칭될: url,       2,    내아이디, author, recipe_name,  drink0, drink0_amount, content 
-#         mydb = cnn()
-#         sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
-#         sql_cmd = f'''
-#         INSERT INTO recipes (copy_url, share, id, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount)
-#         SELECT url, '2', '{id}', author, recipe_name, drink0, drink0_amount, drink1, drink1_amount FROM recipes WHERE url='{url}';
-#         '''
-#         sql_cursor.execute(sql_cmd)
-#         mydb.commit()
-#         sql_cursor.close()
-#         mydb.close()
-#         return '복사완료'
-#     else:
-#         return '레시피 8개 초과' 
-
-
-
-
-def fetch_copied(url):
-    mydb = cnn()
-    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
-    sql_cmd = f'''
-    SELECT url, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount FROM recipes WHERE url='{url}';
-    '''
-    sql_cursor.execute(sql_cmd)
-    mydb.commit()
-    copied = sql_cursor.fetchone()
-    sql_cursor.close()
-    mydb.close()
-    return copied
-
-# INSERT INTO recipes (url, id , author, recipe_name, comments, drink0, drink0_amount) values  ( replace(unix_timestamp(now(6)), '.','0'), 'a', 'a', '물', '{}',  '물', '600');
-    
 def sharing_copy(id, url):
-    copied_data = fetch_copied(url)
+    # 복사하는 함수
+    if recipe_count(id)<8:
+        # 가져올: copy_url, share, id,       author, recipe_name, drink0, drink0_amount
+        # 매칭될: url,       2,    내아이디, author, recipe_name,  drink0, drink0_amount
+        mydb = cnn()
+        sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+        sql_cmd = f'''
+        INSERT INTO recipes (url, copy_url, share, id, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount)
+        SELECT replace(unix_timestamp(now(6)), '.','0'), url, '2', '{id}', author, recipe_name, drink0, drink0_amount, drink1, drink1_amount FROM recipes WHERE url='{url}';
+        '''
+        sql_cursor.execute(sql_cmd)
+        mydb.commit()
+        sql_cursor.close()
+        mydb.close()
+        return '복사완료'
+    else:
+        return '레시피 8개 초과' 
+
+
+# 복사 1번만 가능하게 하는 함수
+def copy_check(id, url):
     mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     sql_cmd = f'''
-    INSERT INTO recipes (copy_url, share, id, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount)
-    VALUES ('{copied_data['url']}', '2', '{id}', '{copied_data['author']}', '{copied_data['recipe_name']}',
-    '{copied_data['drink0']}', '{copied_data['drink0_amount']}',
-    '{copied_data['drink1']}', '{copied_data['drink1_amount']}');
+    SELECT * FROM recipes WHERE id='{id}' AND copy_url = '{url}';
     '''
-    print(sql_cmd)
     sql_cursor.execute(sql_cmd)
     mydb.commit()
+    result = sql_cursor.fetchone()
     sql_cursor.close()
     mydb.close()
-    return '복사완료'
+    # 결과가 없으면 copy 가능 있으면 copy 불가
+    if result == None:
+        return 'available'
+    else:
+        return 'unavailable'
+
+# def fetch_copied(url):
+#     mydb = cnn()
+#     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+#     sql_cmd = f'''
+#     SELECT url, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount FROM recipes WHERE url='{url}';
+#     '''
+#     sql_cursor.execute(sql_cmd)
+#     mydb.commit()
+#     copied = sql_cursor.fetchone()
+#     sql_cursor.close()
+#     mydb.close()
+#     return copied
+
+# # INSERT INTO recipes (url, id , author, recipe_name, comments, drink0, drink0_amount) values  ( replace(unix_timestamp(now(6)), '.','0'), 'a', 'a', '물', '{}',  '물', '600');
+    
+# def sharing_copy(id, url):
+#     copied_data = fetch_copied(url)
+#     mydb = cnn()
+#     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+#     sql_cmd = f'''
+#     INSERT INTO recipes (copy_url, share, id, author, recipe_name, drink0, drink0_amount, drink1, drink1_amount)
+#     VALUES ('{copied_data['url']}', '2', '{id}', '{copied_data['author']}', '{copied_data['recipe_name']}',
+#     '{copied_data['drink0']}', '{copied_data['drink0_amount']}',
+#     '{copied_data['drink1']}', '{copied_data['drink1_amount']}');
+#     '''
+#     print(sql_cmd)
+#     sql_cursor.execute(sql_cmd)
+#     mydb.commit()
+#     sql_cursor.close()
+#     mydb.close()
+#     return '복사완료'
 
 
 # sharing_copy('gd', '16532303070759508')

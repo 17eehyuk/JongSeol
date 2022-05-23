@@ -11,18 +11,31 @@
 <h2>레시피</h2>
 최대 8개까지 추가가능
 
-<form method="post" style="margin-top: 20px; margin-bottom: 20px;">
-    <select id="recipe_name" name="recipe_name">
+
+<form method="post">
+    <table style="margin-top: 20px; margin-bottom: 20px;" border="1px">
+        <tr>
+            <th>레시피명</th>
+            <th>작성자</th>
+            <th>작성시간(가져온시간)</th>
+            <th>선택</th>
+        </tr>
         {% for recipe in recipes %}
-        <option>{{ recipe }}</option>
+        <tr>
+            <td style="width: 200px;">{{recipe['recipe_name']}} </td>
+            <td style="width: 200px;">{{recipe['author']}}</td>
+            <td style="width: 200px;">{{recipe['time']}}</td>
+            <td style="width: 50px;"><input type="radio" name="url" value="{{recipe['url']}}" checked></td>
+        </tr>
         {% endfor %}
-    </select>
+    </table>
+    
+
 {% if recipes|length == 0  %}
 <input type="submit" value="레시피 보기" formaction="/show_recipe/" disabled>
 {% else %}
 <input type="submit" value="레시피 보기" formaction="/show_recipe/">
 {% endif %}
-
     
 {% if recipes|length < 8  %}
     <input type="submit" value="새 레시피" id="new_recipe_btn" formaction="/new_recipe/">

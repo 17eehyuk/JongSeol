@@ -17,8 +17,6 @@
     </p>
 
     <input type="text" id="recipe_name" name="recipe_name" placeholder="레시피이름" style="width: 300px; height: 30px;">
-    <input type="hidden" id="id" name="id" value="{{user_id}}">
-    <input type="hidden" id="author" name="author" value="{{user_id}}">
     <input type="hidden" id="row_count" value="1" disabled>  <!-- 행개수 -->
 
     <table border="1" style="margin-top: 20px; margin-bottom: 20px;">
@@ -29,7 +27,7 @@
             </tr>
             <tr id="row0">
                 <td><input type="text" name="drink0" id="drink0" placeholder="0번음료"></td>
-                <td><input type="number" name="drink0_amount" id="drink0_amount" placeholder="0번음료양(0~600)" oninput="num_only(this); NO_over_600(this);"></td>
+                <td><input type="number" name="drink0_amount" id="drink0_amount" placeholder="0번음료양(1~600)" oninput="num_only(this); NO_over_600(this);"></td>
             </tr>
         </tbody>
     </table>

@@ -100,21 +100,27 @@ def new_recipe():
 
 @app.route('/show_recipe/', methods=['POST'])
 def show_recipe():
-    recipe_name = request.form['recipe_name']
-    recipe_dict = my_pysql.show_detail_recipe(session['session_id'],recipe_name)
+    url = request.form['url']
+    recipe_dict = my_pysql.show_detail_recipe(session['session_id'],url)
     return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict)
+
+
+
+
 
 @app.route('/delete_recipe/', methods=['POST'])
 def delete_recipe():
-    # 더미코드 form을 show_recipe와 같이 쓰기 때문에 없으면 오류가남
-    recipe_name = request.form['recipe_name']
-    return render_template('./main/delete_recipe.html', login_state=True, user_id=session['session_id'] ,recipe_name=recipe_name)
+    recipe_dict = request.form
+    return render_template('./main/delete_recipe.html', login_state=True, user_id=session['session_id'] ,recipe_dict=recipe_dict)
 
 @app.route('/update_recipe/', methods=['POST'])
 def update_recipe():
-    recipe_name = request.form['recipe_name']    
-    recipe_dict = my_pysql.show_detail_recipe(session['session_id'],recipe_name)
+    url = request.form['url']    
+    recipe_dict = my_pysql.show_detail_recipe(session['session_id'],url)
     return render_template('./main/update_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict, recipes=my_pysql.my_recipes(session['session_id']))
+
+
+
 
 @app.route('/make_recipe/', methods=['POST'])
 def make_recipe():
@@ -187,11 +193,16 @@ def sharing_home():
 
 @app.route('/sharing_read/<url>/', methods=['GET','POST'])
 def sharing_read(url):
+    try:
+        recipe = my_pysql.show_recipe_url(url)
+        if recipe['share'] != '1':
+            flash('비공개됐거나 삭제된 레시피 입니다.')
+            return redirect('/recipe/')
+    except:
+        flash('비공개됐거나 삭제된 레시피 입니다.')
+        return redirect('/recipe/')
 
     comments = my_pysql.fetch_comments(url)
-
-
-    recipe = my_pysql.show_recipe_url(url)
     if 'session_id' in session:
         return render_template('./main/sharing_read.html', login_state=True, user_id=session['session_id'], recipe=recipe, comments=comments)
     else:
@@ -254,7 +265,11 @@ def delete_comment(comment_id):
 
 @app.route('/sharing_copy/<url>/', methods=['post'])
 def sharing_copy(url):
-    flash(my_pysql.sharing_copy(session['session_id'], url))
+    if my_pysql.copy_check(session['session_id'], url) == 'available':
+        flash(my_pysql.sharing_copy(session['session_id'], url))
+    elif my_pysql.copy_check(session['session_id'], url) == 'unavailable':
+        # else 써도 되지만 직관적이게 'unavailable' 적었음
+        flash('이미 존재하는 레시피입니다.')    
     return redirect(f'/sharing_read/{url}/')
 
 
@@ -312,11 +327,9 @@ def update_recipe_process():
     req_dict= dict(request.form)
     print(req_dict)
 
-    recipe_name = req_dict['recipe_name']
-    new_recipe_name = req_dict['new_recipe_name']
+    url = req_dict['url']
 
-
-    cmd = f'''recipe_name='{new_recipe_name}', '''
+    cmd = ''
     for i in range(8):
         try:
             drink_amount = 'drink' + str(i) +'_amount'
@@ -325,11 +338,13 @@ def update_recipe_process():
         except:
             # 노즐이 없는경우 오류가 발생하는데 그러면 break를 통해서 for문 탈출
             break
-
     cmd = cmd[:-2]
-    flash(my_pysql.update_recipe(session['session_id'], cmd, recipe_name))
+    print(cmd)
 
-    return redirect('/recipe/')
+    flash(my_pysql.update_recipe(cmd ,url))
+    
+    recipe_dict = my_pysql.show_detail_recipe(session['session_id'],req_dict['url'])
+    return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict)
 
 
 ############################################################### login ###############################################################  

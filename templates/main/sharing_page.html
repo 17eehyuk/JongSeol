@@ -23,7 +23,7 @@
         {% set drink = 'drink'+(i|string) %}
         {% set drink_amount = drink+'_amount' %}
 
-        {% if recipe[drink] != None %}
+        {% if recipe[drink] != '' %}
         <tr>
             <td>{{recipe[drink]}}</td>
             <td>{{recipe[drink_amount]}}</td>

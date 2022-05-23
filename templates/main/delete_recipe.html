@@ -9,10 +9,12 @@
 {% block content %}
 
 
-<h2 style="margin-bottom: 20px;">{{ recipe_name }}를 정말로 삭제하시겠습니까?</h2>
+<h2 style="margin-bottom: 20px;">{{ recipe_dict['recipe_name'] }}를 정말로 삭제하시겠습니까?</h2>
 
 <form method="post">
-<input type="hidden" name="recipe_name" value="{{ recipe_name }}">
+<input type="hidden" name="url" value="{{recipe_dict['url']}}">
+
+<input type="hidden" name="recipe_name" value="{{ recipe_dict['recipe_name'] }}">
 <input type="submit" value="이전으로" formaction="/show_recipe/">
 <input type="submit" formaction="/delete_recipe_process/" value="삭제하기">
 

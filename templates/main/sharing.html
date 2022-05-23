@@ -8,18 +8,18 @@
 <!--내용-->
 {% block content %}
 
-{% if recipes == 'empty' %}
-
-{% else %}
+{% if recipes != 'empty' %}
 
 {% for recipe in recipes %}
-<fieldset>
-    <h3><a href="/sharing_read/{{recipe['url']}}/">{{recipe['title']}}({{recipe['recipe_name']}})</a></h3>
+<div style="margin: 20px; border: 1px solid; width: 700px;">
+    <h3><a href="/sharing_read/{{recipe['url']}}/">{{recipe['title']}}</a></h3>
+    레시피명 : {{recipe['recipe_name']}}<br>
     작성자 : {{recipe['author']}}<br>
     최종수정 : {{recipe['share_time']}}
-</fieldset>
+</div>
 {% endfor %}
-
+{% else %}
+공유중인 레시피가 없습니다.
 {% endif %}
 
 

@@ -60,14 +60,16 @@ function valid_dect(){
     //id가져오기
     for(var i=0; i<row_count; i++){
       drink = $(`#drink${i}`).val();  //val : content 접근
-      amount = $(`#drink${i}_amount`).val();
-      if(drink=='' || amount=='' || recipe_name==''){return alert('데이터를 입력하세요')}
+      amount = Number($(`#drink${i}_amount`).val());
+      if(drink=='' || recipe_name==''){return alert('데이터를 입력하세요')}
       else{
         drinks[i] = drink
-        amount_sum = amount_sum + Number(amount)
+        amount_sum = amount_sum + amount
       }
       if (ONLY_hangul(drink)==false){return alert('음료이름(재료)는 한글만 가능')}
+      if ((amount == 0) || (amount>600)){return alert('음료양은 1~600')}
     }
+
     if(NO_spc(recipe_name) == false){
       return alert(`한글, 영어, 숫자만 입력가능`)
     }
@@ -132,7 +134,7 @@ function append_table(){
     $("#recipe").append(`
     <tr id="row${row_count}">
       <td><input type="text" name="drink${row_count}" id="drink${row_count}" placeholder="${row_count}번음료"></td>
-      <td><input type="number" name="drink${row_count}_amount" id="drink${row_count}_amount" placeholder="${row_count}번음료양(0~600)" oninput="num_only(this); NO_over_600(this)"></td>
+      <td><input type="number" name="drink${row_count}_amount" id="drink${row_count}_amount" placeholder="${row_count}번음료양(1~600)" oninput="num_only(this); NO_over_600(this)"></td>
     </tr>
     `)
     
@@ -156,29 +158,6 @@ function update_dect(){
   amount_sum = 0
   sum_flag=0
 
-  // 기존 레시피명 중복인지 판단
-  var existing_recipe = $('#existing_recipe').html().split(',')
-  existing_recipe.pop() //마지막 콤마 제거
-  var old_recipe_name = $('#old_recipe_name').val();
-  var new_recipe_name = $('#new_recipe_name').val();
-  
-  if(NO_spc(new_recipe_name) == false){
-    return alert(`한글, 영어, 숫자만 입력가능`)
-  }
-
-
-  for (var i=0; i<existing_recipe.length; i++){
-
-    // 수정안한경우는 상관없음
-    if(new_recipe_name==old_recipe_name){
-      continue;
-    }
-
-    if(new_recipe_name == existing_recipe[i]){
-      return alert(`레시피명 '${new_recipe_name}' 중복`)
-    }
-  }
-
   for(var i=0; i<row_count; i++){
     amount = $(`#drink${i}_amount`).val();
     if(amount==''){return alert('데이터를 입력하세요')}
@@ -188,7 +167,7 @@ function update_dect(){
   }
     
 
-  if(amount_sum>=0 && amount_sum<=700){sum_flag=0} //문제없음
+  if(amount_sum>0 && amount_sum<=700){sum_flag=0} //문제없음
   else{sum_flag=1}  //문제있음
 
   if(sum_flag==0){
