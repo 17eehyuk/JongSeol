@@ -1,11 +1,58 @@
 from flask import Flask, render_template, request, redirect, session, flash
 from my_modules import my_pysql
 import json
+import socket, time
 import serial
 
 app = Flask(__name__)
 app.secret_key = "ssijfo@#!@#123"       # session을 사용하기 위해서는 반드시 있어야함
 app.jinja_env.add_extension('jinja2.ext.loopcontrols')      # jinja에서 break 사용가능
+
+
+# ip주소
+get_ip_addr = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+get_ip_addr.connect(("8.8.8.8", 80))
+ip_addr = get_ip_addr.getsockname()[0]
+
+
+
+
+
+
+def esp32_tcp(cmd):
+    print(cmd)
+    # TCP접속
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((ip_addr, 9008)) # ip주소(ipconfig IPv4 주소), 포트번호 지정
+    server_socket.listen(0)     # 클라이언트의 연결요청을 기다리는 상태    
+    client_socket, addr = server_socket.accept() # 연결 요청을 수락함. 길이가 2인 튜플 데이터를 가져옴
+    
+    # 명령 보내기
+    client_socket.send(cmd.encode())      # 클라이언트에게 메세지 전송
+
+
+    # ESP32 메시지1 (확인용)
+    rx_msg = client_socket.recv(100) # 클라이언트로 부터 데이터를 받음. 출력되는 버퍼 사이즈. (만약 2할 경우, 2개의 데이터만 전송됨)
+    print(rx_msg.decode()) # 받은 데이터를 해석함.
+
+    # ESP 메시지2 (아두이노 결과)
+    rx_msg = client_socket.recv(100) # 클라이언트로 부터 데이터를 받음. 출력되는 버퍼 사이즈. (만약 2할 경우, 2개의 데이터만 전송됨)
+    print(rx_msg.decode()) # 받은 데이터를 해석함.
+
+    server_socket.close()      
+    time.sleep(1)
+    return rx_msg.decode()
+
+
+
+
+
+
+
+
+
+
+
 
 ############################################################### function ###############################################################
 def local():
@@ -23,6 +70,10 @@ def len3(string):
 
 def len32(string):
     return str(string) + ''.join(list('!' for i in range(32-len(string))))
+
+def len16(string):
+    return str(string) + ''.join(list('!' for i in range(16-len(string))))
+
 
 def my_serial(cmd):
     py_serial = serial.Serial(
@@ -167,11 +218,15 @@ def make_recipe():
     print(err[:-2])
 
     try:
-        my_serial(cmd)
-        if err=='':     # 에러가 없는 경우
-            alert = f'''{recipe_name} 제작완료'''
-        else:
-            alert = err[:-2]    
+        # my_serial(cmd)
+        cmd = len16(cmd)
+        alert = esp32_tcp(cmd)
+
+        # if err=='':     # 에러가 없는 경우
+        #     # alert = f'''{recipe_name} 제작완료'''
+        #     alert = f'''{cmd}'''
+        # else:
+        #     alert = err[:-2]    
     except:
         alert = '사용할수 없는 상태'
 

@@ -44,14 +44,16 @@ SELECT * FROM recipes;
 
 
 
-#recipes(AWS)
-# url: 주소, share: 공개여부, time: 레시피저장시간, share_time: 최종수정시간, title: 글제목, rate: 추천수, id: 저장위치, author: 작성자, recipe_name: 레시피명, content: 글내용, comments: 댓글
+#recipes
+# url: 주소, share: 공개여부, time: 레시피저장시간, share_time: 최종수정시간, title: 글제목, rate: 추천수
+# id: 저장위치, author: 작성자, recipe_name: 레시피명, content: 글내용, comments: 댓글
 CREATE TABLE recipes(
 url VARCHAR(17) NOT NULL DEFAULT '',
 copy_url VARCHAR(17) NOT NULL DEFAULT '',
 share CHAR(1) NOT NULL DEFAULT '0',
 time timestamp NOT NULL DEFAULT now(),
 share_time timestamp NOT NULL DEFAULT now(),
+# update_time timestamp NOT NULL DEFAULT now(),
 title VARCHAR(20) NOT NULL DEFAULT '',
 rate SMALLINT NOT NULL DEFAULT 0,
 id VARCHAR(10) NOT NULL,
