@@ -6,9 +6,14 @@ Serail : 아두이노와 통신
 
 #include <WiFi.h>
 WiFiClient client;    // WiFiClient 를 clinet라고 정의
-const char* ssid = "LFinWSU-01-2G"; // Your WiFi SSID
-const char* password = "1234567!"; // Your WiFi Password
-const char* host = "192.168.223.47";  // ipconfig 이용해서 IPv4 주소 입력
+//const char* ssid = "iptime99"; // Your WiFi SSID
+//const char* password = "dlgurwo721"; // Your WiFi Password
+
+
+
+const char* ssid = "sjh"; // Your WiFi SSID
+const char* password = "56740148"; // Your WiFi Password
+const char* host = "192.168.0.12";  // ipconfig 이용해서 IPv4 주소 입력
 //const char* host = "3.39.94.57";  // AWS
 
 const uint16_t port = 9008;

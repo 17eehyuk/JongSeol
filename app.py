@@ -39,7 +39,7 @@ def esp32_tcp(cmd):
     rx_msg = client_socket.recv(100) # 클라이언트로 부터 데이터를 받음. 출력되는 버퍼 사이즈. (만약 2할 경우, 2개의 데이터만 전송됨)
     print(rx_msg.decode()) # 받은 데이터를 해석함.
 
-    server_socket.close()      
+    server_socket.close()   
     time.sleep(1)
     return rx_msg.decode()
 
@@ -215,20 +215,23 @@ def make_recipe():
             return manipulated()
     
     alert = ''
-    print(err[:-2])
+    if err != '':
+        msg = err[:-2]
+        print(msg)
+        alert = msg
+    else:
+        try:
+            # my_serial(cmd)
+            cmd = len16(cmd)
+            alert = esp32_tcp(cmd)
 
-    try:
-        # my_serial(cmd)
-        cmd = len16(cmd)
-        alert = esp32_tcp(cmd)
-
-        # if err=='':     # 에러가 없는 경우
-        #     # alert = f'''{recipe_name} 제작완료'''
-        #     alert = f'''{cmd}'''
-        # else:
-        #     alert = err[:-2]    
-    except:
-        alert = '사용할수 없는 상태'
+            # if err=='':     # 에러가 없는 경우
+            #     # alert = f'''{recipe_name} 제작완료'''
+            #     alert = f'''{cmd}'''
+            # else:
+            #     alert = err[:-2]    
+        except:
+            alert = '사용할수 없는 상태'
 
     
     recipe_dict = my_pysql.show_recipe_url(recipe_dict['url'])      # 조금 조잡하긴한데 옛날코드와 호환이 달라서 재갱신 코드가 필요

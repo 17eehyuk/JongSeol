@@ -7,6 +7,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'tmp'@'127.0.0.1' WITH GRANT OPTION;
 
 
 #조회
+USE jongseol;
 SELECT * FROM users;
 SELECT * FROM recipes;
 
@@ -19,8 +20,6 @@ DROP TABLE recipes;
 #DB생성(UTF8)
 CREATE DATABASE jongseol DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-USE jongseol;
-
 #users
 CREATE TABLE users(
 id VARCHAR(10) UNIQUE NOT NULL ,
@@ -31,18 +30,7 @@ state CHAR(1) NOT NULL
 );
 
 #dbadmin
-INSERT INTO users VALUES ('dbadmin', md5('1234'), 'A', '9999', '0');
-
-
-
-
-DROP TABLE recipes;
-SELECT * FROM recipes;
-
-
-
-
-
+INSERT INTO users VALUES ('dbadmin', md5('1234'), 'A', '9999', '0')
 
 #recipes
 # url: 주소, share: 공개여부, time: 레시피저장시간, share_time: 최종수정시간, title: 글제목, rate: 추천수
@@ -63,13 +51,17 @@ drink0 VARCHAR(10) DEFAULT '',
 drink0_amount CHAR(4) DEFAULT '',
 drink1 VARCHAR(10) DEFAULT '',
 drink1_amount CHAR(4) DEFAULT '',
+drink2 VARCHAR(10) DEFAULT '',
+drink2_amount CHAR(4) DEFAULT '',
+drink3 VARCHAR(10) DEFAULT '',
+drink3_amount CHAR(4) DEFAULT '',
 content VARCHAR(200) NOT NULL DEFAULT '',
 comments JSON
 );
 
 
 
-
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 #recipes(초간략화)
