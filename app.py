@@ -241,8 +241,16 @@ def make_recipe():
 
 
 
-@app.route('/sharing/<page_count>/')
-def sharing_home(page_count):
+@app.route('/sharing_home/')
+def sharing_home():
+    if 'session_id' in session:
+        return render_template('./main/sharing_home.html', login_state=True, user_id=session['session_id'])
+    else:
+        return render_template('./login/login.html', login_state = False)
+
+
+@app.route('/sharing_all/<page_count>/')
+def sharing_all(page_count):
     try:
         page_count = int(page_count)
     except:
@@ -253,7 +261,7 @@ def sharing_home(page_count):
     recipes = my_pysql.show_all_sharings(page_count)
     recipes_count = my_pysql.row_count()
     if 'session_id' in session:
-        return render_template('./main/sharing.html', login_state=True, user_id=session['session_id'], recipes=recipes, recipes_count=recipes_count, currnet_page=page_count)
+        return render_template('./main/sharing_all.html', login_state=True, user_id=session['session_id'], recipes=recipes, recipes_count=recipes_count, currnet_page=page_count)
     else:
         return render_template('./login/login.html', login_state = False)
     

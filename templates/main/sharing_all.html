@@ -2,7 +2,7 @@
 
 <!--제목-->
 {% block title %}
-    레시피보기
+    모든레시피
 {% endblock %}
 
 <!--내용-->
@@ -19,18 +19,18 @@
 {% set previous_page = currnet_page - 1 %}
 
 {% if currnet_page!=1 %}
-<a href="/sharing/{{previous_page}}/">이전</a>
+<a href="/sharing_all/{{previous_page}}/">이전</a>
 {% endif %}
 {{currnet_page}}
 {% if currnet_page <= page_count %}
-<a href="/sharing/{{next_page}}/">다음</a>
+<a href="/sharing_all/{{next_page}}/">다음</a>
 {% endif %}
 
 
 
 {#
     {% for page_link in range(1, page_count+2) %}
-    <a href="/sharing/{{page_link}}/">{{page_link}}</a>
+    <a href="/sharing_all/{{page_link}}/">{{page_link}}</a>
     {% endfor %}
 
 
@@ -44,7 +44,9 @@
     최종수정 : {{recipe['share_time']}}
 </div>
 {% endfor %}
+
 {% else %}
+<a href="/">홈으로</a><br><br>
 공유중인 레시피가 없습니다.
 {% endif %}
 
