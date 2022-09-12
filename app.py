@@ -1,3 +1,4 @@
+from re import M
 from flask import Flask, render_template, request, redirect, session, flash
 from my_modules import my_pysql
 import json
@@ -258,10 +259,33 @@ def sharing_all(page_count):
         return redirect('/')
 
 
-    recipes = my_pysql.show_all_sharings(page_count)
-    recipes_count = my_pysql.row_count()
+    recipes = my_pysql.show_sharings(page_count)
+    recipes_count = my_pysql.sharing_recipe_row_count()
     if 'session_id' in session:
-        return render_template('./main/sharing_all.html', login_state=True, user_id=session['session_id'], recipes=recipes, recipes_count=recipes_count, currnet_page=page_count)
+        return render_template('./main/sharing_all.html', login_state=True, user_id=session['session_id'], recipes=recipes, recipes_count=recipes_count, currnet_page=page_count, state='all', recipe_name='전체')
+    else:
+        return render_template('./login/login.html', login_state = False)
+
+
+
+@app.route('/sharing_search_process/', methods=['POST'])
+def sharing_search_process():
+    recipe_name = request.form['recipe_name']
+    print(recipe_name)
+    return redirect(f'/sharing_search/{recipe_name}/1/')
+
+
+@app.route('/sharing_search/<recipe_name>/<page_count>/')
+def sharing_search(page_count, recipe_name):
+    try:
+        page_count = int(page_count)
+    except:
+        flash('잘못된접근')
+        return redirect('/')
+    recipes = my_pysql.show_sharings(page_count, recipe_name)
+    recipes_count = my_pysql.sharing_recipe_row_count(recipe_name)
+    if 'session_id' in session:
+        return render_template('./main/sharing_all.html', login_state=True, user_id=session['session_id'], recipes=recipes, recipes_count=recipes_count, currnet_page=page_count, state='search', recipe_name=recipe_name)
     else:
         return render_template('./login/login.html', login_state = False)
     

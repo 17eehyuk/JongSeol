@@ -309,13 +309,17 @@ def sharing(url, title, content):
     mydb.close()
     return '공유완료'
 
-def show_all_sharings(page_count):
+def show_sharings(page_count, recipe_name=''):
     mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
-    command = f'''
-    SELECT * FROM recipes WHERE share='1' ORDER BY share_time DESC LIMIT {5*(page_count-1)}, 5;
-    '''
-    print(command)
+    if recipe_name=='':
+        command = f'''
+        SELECT * FROM recipes WHERE share='1' ORDER BY share_time DESC LIMIT {5*(page_count-1)}, 5;
+        '''
+    else:
+        command = f'''
+        SELECT * FROM recipes WHERE share='1' AND recipe_name = '{recipe_name}' ORDER BY share_time DESC LIMIT {5*(page_count-1)}, 5;
+        '''
     sql_cursor.execute(command)
     mydb.commit()
     recipes = sql_cursor.fetchall()   # 없는경우는 tuple임    # 있는경우는 list임
@@ -326,12 +330,17 @@ def show_all_sharings(page_count):
     return recipes
 
 
-def row_count():
+def sharing_recipe_row_count(recipe_name=''):
     mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
-    command = f'''
-    SELECT COUNT(*) FROM recipes WHERE share = '1';
-    '''
+    if recipe_name=='':
+        command = f'''
+        SELECT COUNT(*) FROM recipes WHERE share = '1';
+        '''
+    else:
+        command = f'''
+        SELECT COUNT(*) FROM recipes WHERE share = '1' AND recipe_name = '{recipe_name}';
+        '''
     sql_cursor.execute(command)
     mydb.commit()
     count = sql_cursor.fetchone()   # 없는경우는 tuple임    # 있는경우는 list임
@@ -351,6 +360,45 @@ def sharing_hide(url):
     sql_cursor.close()
     mydb.close()
     return '비공개완료'
+
+def sharing_search_by_ingredient(ingredient):
+    # 수정해야됨 #
+    mydb = cnn()
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    command = f'''
+    (SELECT * FROM recipes WHERE drink0 LIKE '{ingredient}')
+    UNION
+    (SELECT * FROM recipes WHERE drink1 LIKE '{ingredient}')
+    UNION
+    (SELECT * FROM recipes WHERE drink2 LIKE '{ingredient}')
+    UNION
+    (SELECT * FROM recipes WHERE drink3 LIKE '{ingredient}');
+    '''
+    sql_cursor.execute(command)
+    mydb.commit()
+    recipes = sql_cursor.fetchall()   # 없는경우는 tuple임    # 있는경우는 list임
+    sql_cursor.close()
+    mydb.close()
+    if recipes == ():
+        recipes = 'empty'
+    return recipes
+
+    
+def sharing_search_by_recipe_name(recipe_name):
+    mydb = cnn()
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    command = f'''
+    SELECT * FROM recipes WHERE share = '1' AND recipe_name = '{recipe_name}'
+    '''
+    sql_cursor.execute(command)
+    mydb.commit()
+    recipes = sql_cursor.fetchall()   # 없는경우는 tuple임    # 있는경우는 list임
+    sql_cursor.close()
+    mydb.close()
+    if recipes == ():
+        recipes = 'empty'
+    return recipes
+
 
 
 ############## 관리자 ################
