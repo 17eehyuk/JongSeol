@@ -309,12 +309,13 @@ def sharing(url, title, content):
     mydb.close()
     return '공유완료'
 
-def show_all_sharings():
+def show_all_sharings(page_count):
     mydb = cnn()
     sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
     command = f'''
-    SELECT * FROM recipes WHERE share='1' ORDER BY share_time DESC;
+    SELECT * FROM recipes WHERE share='1' ORDER BY share_time DESC LIMIT {5*(page_count-1)}, 5;
     '''
+    print(command)
     sql_cursor.execute(command)
     mydb.commit()
     recipes = sql_cursor.fetchall()   # 없는경우는 tuple임    # 있는경우는 list임
@@ -324,6 +325,19 @@ def show_all_sharings():
         recipes = 'empty'
     return recipes
 
+
+def row_count():
+    mydb = cnn()
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    command = f'''
+    SELECT COUNT(*) FROM recipes WHERE share = '1';
+    '''
+    sql_cursor.execute(command)
+    mydb.commit()
+    count = sql_cursor.fetchone()   # 없는경우는 tuple임    # 있는경우는 list임
+    sql_cursor.close()
+    mydb.close()
+    return count['COUNT(*)']
 
 
 def sharing_hide(url):

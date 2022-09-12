@@ -152,6 +152,7 @@ def new_recipe():
 @app.route('/show_recipe/', methods=['POST'])
 def show_recipe():
     url = request.form['url']
+    print(url)
     recipe_dict = my_pysql.show_detail_recipe(session['session_id'],url)
     return render_template('./main/show_recipe.html', login_state=True, user_id=session['session_id'] , recipe_dict = recipe_dict)
 
@@ -240,11 +241,19 @@ def make_recipe():
 
 
 
-@app.route('/sharing/')
-def sharing_home():
-    recipes = my_pysql.show_all_sharings()
+@app.route('/sharing/<page_count>/')
+def sharing_home(page_count):
+    try:
+        page_count = int(page_count)
+    except:
+        flash('잘못된접근')
+        return redirect('/')
+
+
+    recipes = my_pysql.show_all_sharings(page_count)
+    recipes_count = my_pysql.row_count()
     if 'session_id' in session:
-        return render_template('./main/sharing.html', login_state=True, user_id=session['session_id'], recipes=recipes)
+        return render_template('./main/sharing.html', login_state=True, user_id=session['session_id'], recipes=recipes, recipes_count=recipes_count, currnet_page=page_count)
     else:
         return render_template('./login/login.html', login_state = False)
     

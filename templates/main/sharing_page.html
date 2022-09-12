@@ -36,9 +36,10 @@
 
 <textarea id="content" name="content" placeholder="글설명" style="width: 600px; height: 200px; resize: none;" required>{{ recipe['content'] }}</textarea><br>
 
-
-<input type="submit" value="이전으로" style="width: 100px; height: 50px;" onclick="back()"> <!-- required를 지우기 위해서 submit 대신 button 사용 -->
+<input type="hidden" name="url" value="{{recipe['url']}}">
 <input type="submit" value="저장" style="width: 100px; height: 50px;" formaction="/sharing_process/{{ recipe['url'] }}/">
+<input type="submit" value="취소" style="width: 100px; height: 50px;" onclick="back()"> <!-- required를 지우기 위해서 submit 대신 button 사용 -->
+
 
 </form>
 

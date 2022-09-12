@@ -57,12 +57,10 @@
         {% endif %}
     {% endfor %}  
 
-
-        
 </table>   
 
 
-<input type="submit" value="이전으로" formaction="/recipe/">
+<!-- <input type="submit" value="이전으로" formaction="/recipe/"> -->
 <!-- <input type="submit" id="make" formaction="/make_recipe/" value="만들기" > -->
 <input type="button" id="make" value="만들기"  onclick="ban_while_making()">
 {% if recipe_dict['share'] == '0' %}

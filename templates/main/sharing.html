@@ -10,6 +10,32 @@
 
 {% if recipes != 'empty' %}
 
+{% set page_count = (recipes_count-1)//5  %}            {# 페이지개수 #}
+
+
+
+
+{% set next_page = currnet_page + 1 %}
+{% set previous_page = currnet_page - 1 %}
+
+{% if currnet_page!=1 %}
+<a href="/sharing/{{previous_page}}/">이전</a>
+{% endif %}
+{{currnet_page}}
+{% if currnet_page <= page_count %}
+<a href="/sharing/{{next_page}}/">다음</a>
+{% endif %}
+
+
+
+{#
+    {% for page_link in range(1, page_count+2) %}
+    <a href="/sharing/{{page_link}}/">{{page_link}}</a>
+    {% endfor %}
+
+
+#}
+
 {% for recipe in recipes %}
 <div style="margin: 20px; border: 1px solid; width: 700px;">
     <h3><a href="/sharing_read/{{recipe['url']}}/">{{recipe['recipe_name']}}</a></h3>
