@@ -1,4 +1,3 @@
-from re import M
 from flask import Flask, render_template, request, redirect, session, flash
 from my_modules import my_pysql
 import json
@@ -24,6 +23,7 @@ def esp32_tcp(cmd):
     print(cmd)
     # TCP접속
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.settimeout(10)    # 타임아웃(무한루프 방지)
     server_socket.bind((ip_addr, 9008)) # ip주소(ipconfig IPv4 주소), 포트번호 지정
     server_socket.listen(0)     # 클라이언트의 연결요청을 기다리는 상태    
     client_socket, addr = server_socket.accept() # 연결 요청을 수락함. 길이가 2인 튜플 데이터를 가져옴
@@ -182,7 +182,7 @@ def make_recipe():
     recipe_name = recipe_dict['recipe_name']        # 아메리카노
     nozzles=local()                                 # {'admin_id': 'admin', 'admin_pw': '1251', 'nozzle0': '', 'nozzle1': '', 'nozzle2': '', 'nozzle3': '우유', 'nozzle4': '', 'nozzle5': '', 'nozzle6': '물', 'nozzle7': '에스프레소'}
                              
-    cmd = ''
+    cmd = 'ST'
     err = ''
 
     for i in range(8):

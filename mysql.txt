@@ -1,0 +1,74 @@
+#cmd에서 mysql 접속
+cd C:\Program Files\mysql-8.0.28-winx64\bin
+
+#재실행(우분투)
+service mysql restart
+
+#최초 로그인
+mysql -uroot -p
+
+#유저생성, 권한부여, 권한저장  #외부접속의 경우 'localhost' 대신 '%'
+CREATE USER 'tmp'@'localhost' IDENTIFIED BY '1234';
+GRANT ALL PRIVILEGES ON *.* TO 'tmp'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+#비밀번호 변경
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'tjqj123';
+
+#mysql 종료
+quit;
+
+#로그인
+mysql -utmp -p1234
+
+#모든 유저 확인, 현재 유저 권한조회
+USE mysql;
+SELECT USER, HOST FROM USER;
+SHOW GRANTS;
+
+#유저삭제
+DROP USER 'tmp'@'localhost';
+
+#권한조회
+SHOW GRANTS FOR 'tmp'@'localhost';
+
+#DB생성(UTF8)
+CREATE DATABASE tmpdb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+#DB보기
+SHOW DATABASES;
+
+#DB삭제
+DROP DATABASE tmpdb;
+
+#테이블 생성
+CREATE TABLE tmpdb.users(
+id VARCHAR(10) UNIQUE NOT NULL ,
+pw VARCHAR(50) NOT NULL,
+sex CHAR(1) NOT NULL,
+yb CHAR(4) NOT NULL 
+);
+
+#모든 테이블 보기
+USE tmpdb;
+SHOW TABLES;
+
+#테이블 삭제
+DROP TABLE tmpdb.users;
+
+#행삭제
+DELETE FROM tmpdb.users WHERE id='A';
+
+#데이터 삽입
+INSERT INTO tmpdb.users VALUES ('A', '1234', 'M', '1990'), ('B', '1234', 'F', '2000');
+INSERT INTO tmpdb.nozzles(id) VALUES('A');
+
+#모든 데이터보기
+SELECT * FROM tmpdb.users;
+
+
+# 행 복사
+INSERT INTO 저장할테이블
+SELECT 복사당할열 FROM 가져올위치
+
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '테이블 이름';
