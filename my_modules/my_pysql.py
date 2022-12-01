@@ -1,8 +1,8 @@
-from unittest import result
 import pymysql
 import time, datetime
 import json
-
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
 
 # UPDATE recipes SET rate = rate + 1 WHERE url='{url}';
 
@@ -594,6 +594,134 @@ def copy_check(id, url):
         return 'available'
     else:
         return 'unavailable'
+
+
+# 앱솔
+def absol(id, url):
+
+    html = urlopen(url)
+
+    soup = BeautifulSoup(html, "html.parser") 
+    selector = "body > main > div > div > article > div.hidden.md\:block.recipe-wrapper > div.drinks-content > ul"
+
+    soup_title = soup.select_one('body > main > div > div > article > h1')
+    recipe_title = ''
+    for i in soup_title:
+        recipe_title = str(i)
+
+    recipe = soup.select_one(selector)
+    li_tags = recipe.find_all('li')
+
+    absol_list = []
+
+
+    for li_tag in li_tags:
+        if len(li_tag) != 7:
+            continue
+        else:
+            tmp_list = []
+            for j in li_tag:
+                for k in j:
+                    tmp_list.append(k)
+            try:
+                if tmp_list[2][-2:]=='ml':
+                    drink_ml = tmp_list[2][:-3]     # tmp_list[2] : ml       ex) 30 ml
+                    drink_name = tmp_list[6]        # tmp_list[6] : 음료명
+                    absol_list.append([drink_ml, drink_name])
+            except:
+                pass
+    
+    #for absol_recipe in absol_list:
+
+
+    # print(recipe_title)
+    # print(absol_list)
+
+    absol_dict = {}
+
+    absol_dict['recipe_name'] = recipe_title
+
+    for i in range(len(absol_list)):
+        if i<4:
+            absol_dict[f'drink{str(i)}'] = absol_list[i][1]
+            absol_dict[f'drink{str(i)}_amount'] = absol_list[i][0]
+
+    # return absol_dict
+
+
+    tmp_dict = absol_dict                     # {'recipe_name': '아메리카노', 'drink0': '물', 'drink0_amount': '600', 'drink1': '에스프레소', 'drink1_amount': '100'}
+    print(tmp_dict)
+
+
+    # 레시피명과 0번은 공백이 될 수 가 없음, 오류역시 말도안됨
+    try:
+        if ((tmp_dict['recipe_name']=='') or (tmp_dict['drink0'] == '') or (tmp_dict['drink0_amount'] == '')):
+            return 'manipulated'
+    except:
+        return 'manipulated'
+
+    
+    dic_len = int((len(tmp_dict) - 1)/2)     # -1: recipe_name
+
+    if (dic_len<1) or (dic_len>8):       # 행이 하나도 없다는 의미, 행을 많이 추가한 경우
+        return 'manipulated'
+   
+
+    # 새 레시피이기 때문에 무조건 id==author
+    keys ='url, id , author, recipe_name, comments, share, '
+    values = f''' '{url}', '{id}', 'absol_site', '{tmp_dict['recipe_name']}', '{{}}', 3, '''
+
+    total_amout = 0
+
+    for i in range(dic_len):
+        drink = 'drink' + str(i)                # drink0
+        drink_amount = drink + '_amount'        # drink0_amount
+
+        keys = keys + drink + ', ' + drink_amount + ', '
+
+        try:
+            amount = int(tmp_dict[drink_amount])
+            if not((amount > 0) and (amount <= 600)):
+                return 'manipulated'
+
+            total_amout = total_amout + amount
+            
+            if total_amout>700:
+                return 'manipulated'
+
+        except:
+            # int()가 안된다는 의미 따라서 무조건 조작
+            return 'manipulated'       
+        values = values + f''' '{tmp_dict[drink]}', '{tmp_dict[drink_amount]}', '''
+
+
+    keys = keys[:-2]
+    values = values[:-2]
+    mydb = cnn()
+    sql_cursor = mydb.cursor(pymysql.cursors.DictCursor)
+    command = f'''
+    INSERT INTO recipes ({keys}) values  ({values});
+    '''
+    print(command)
+
+    sql_cursor.execute(command)
+    mydb.commit()
+    sql_cursor.close()
+    mydb.close()
+
+    return '레시피 추가 성공'
+
+
+
+
+
+
+
+
+
+
+
+ # {'recipe_name': '아메리카노', 'drink0': '물', 'drink0_amount': '600', 'drink1': '에스프레소', 'drink1_amount': '100'}
 
 # def fetch_copied(url):
 #     mydb = cnn()

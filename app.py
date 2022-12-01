@@ -73,32 +73,32 @@ def len32(string):
     return str(string) + ''.join(list('!' for i in range(32-len(string))))
 
 def len16(string):
-    return str(string) + ''.join(list('!' for i in range(16-len(string))))
+    return str(string) + ''.join(list('!' for i in range(18-len(string))))      # ST 포함 따라서 18
 
 
-def my_serial(cmd):
-    py_serial = serial.Serial(
-        port='COM4',    #본인에게 맞는 포트 설정해주기
-        baudrate=9600,
-    )
-    serial_flag = 0
-    rx_result = ''
+# def my_serial(cmd):
+#     py_serial = serial.Serial(
+#         port='COM4',    #본인에게 맞는 포트 설정해주기
+#         baudrate=9600,
+#     )
+#     serial_flag = 0
+#     rx_result = ''
 
-    while True:
-        if py_serial.readable():
-            rx = py_serial.readline()[:-1].decode()
-            print(rx)
-            rx_result = rx_result + rx + '\n'
+#     while True:
+#         if py_serial.readable():
+#             rx = py_serial.readline()[:-1].decode()
+#             print(rx)
+#             rx_result = rx_result + rx + '\n'
 
-        # 명령어 전송
-        if serial_flag==0 :
-            tx = len32(cmd)
-            py_serial.write(tx.encode())
-            serial_flag = 1
+#         # 명령어 전송
+#         if serial_flag==0 :
+#             tx = len32(cmd)
+#             py_serial.write(tx.encode())
+#             serial_flag = 1
 
-        if rx[0:9] == 'Complete!':
-            break
-    return rx_result
+#         if rx[0:9] == 'Complete!':
+#             break
+#     return rx_result
 
 def manipulated():
     flash('조작감지')
@@ -570,6 +570,24 @@ def update_process():
     if(my_pysql.update_profile(new_sex, new_yb, new_pw, session['session_id']) == 'manipulated'):
         return manipulated()
     return redirect('/managing/')
+
+@app.route('/absol/')
+def absol():
+    if 'session_id' in session:
+        return render_template('./main/absol.html', login_state=True, user_id=session['session_id'])
+    else:
+        return render_template('./login/login.html', login_state = False)
+    
+
+@app.route('/absol_process/', methods=['post'])
+def absol_process():
+    absol_url = request.form['absol_url']
+    try:
+        my_pysql.absol(session['session_id'], absol_url)
+        flash('추가성공')
+    except:
+        flash('실패')
+    return redirect('/recipe/')
 
 ############################################################### errs ###############################################################
 @app.errorhandler(404)

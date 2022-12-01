@@ -1,12 +1,1 @@
-{
-    "admin_id": "admin",
-    "admin_pw": "123",
-    "nozzle0": "우유",
-    "nozzle1": "물",
-    "nozzle2": "",
-    "nozzle3": "",
-    "nozzle4": "",
-    "nozzle5": "",
-    "nozzle6": "",
-    "nozzle7": ""
-}
+{"admin_id": "admin", "admin_pw": "1234", "nozzle0": "\ub9e5\uc8fc", "nozzle1": "\uc624\ub80c\uc9c0\uc8fc\uc2a4", "nozzle2": "\ube14\ub8e8\ub808\ubaac\uc5d0\uc774\ub4dc", "nozzle3": "\uc18c\uc8fc", "nozzle4": "", "nozzle5": "", "nozzle6": "", "nozzle7": ""}

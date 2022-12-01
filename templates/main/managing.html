@@ -17,7 +17,7 @@
             <th width="80px">노즐번호</th>
             <th width="200px">음료</th>
         </tr>
-        {% for i in range(8) %}
+        {% for i in range(4) %}
         {% set nozzle = 'nozzle' + (i|string) %}
         <tr>
             <td style="text-align: center;">{{i}}</td>
@@ -68,11 +68,11 @@
             <th width="80px">노즐번호</th>
             <th width="200px">음료</th>
         </tr>
-        {% for i in range(8) %}
+        {% for i in range(4) %}
         {% set nozzle = 'nozzle' + (i|string) %}
         <tr>
             <td style="text-align: center;">{{i}}</td>
-            <td><input type="text" maxlength="10" value="{{nozzles[nozzle]}}" name="nozzle{{i}}" style="width: 200px;"></td>
+            <td><input type="text" maxlength="30" value="{{nozzles[nozzle]}}" name="nozzle{{i}}" style="width: 200px;"></td>
         </tr>
         {% endfor %}
     </table>

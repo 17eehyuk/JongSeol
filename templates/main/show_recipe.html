@@ -29,8 +29,13 @@
     상태 : 타인의레시피<br>
     작성일 : {{ recipe_dict['time'] }}<br>
     최종수정일 : {{ recipe_dict['share_time'] }}<br>
-{% endif %}
 
+
+{% elif recipe_dict['share'] == '3' %}
+    <h2 style="margin-bottom: 10px;"><a href="{{recipe_dict['url']}}" target="_blank">{{ recipe_dict['recipe_name'] }} (작성자 : 앱솔공식홈페이지)</a></h2>
+    작성일 : {{ recipe_dict['time'] }}<br>
+    최종수정일 : {{ recipe_dict['share_time'] }}<br>
+{% endif %}
 
 
 <form method="post" name="recipe_form" action="/make_recipe/">

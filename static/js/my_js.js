@@ -130,7 +130,7 @@ function recipe_update(){
 function append_table(){
   row_count = Number($('#row_count').val())
   $('#pop_table_btn').attr("disabled", false) // 추가시 무조건 하나 삭제가능
-  if(row_count<=7){
+  if(row_count<=3){
     $("#recipe").append(`
     <tr id="row${row_count}">
       <td><input type="text" name="drink${row_count}" id="drink${row_count}" placeholder="${row_count}번음료"></td>
@@ -139,7 +139,7 @@ function append_table(){
     `)
     
     $('#row_count').val(row_count + 1);
-    if(row_count==7){$('#append_table_btn').attr("disabled",true)}  //행추가불가
+    if(row_count==3){$('#append_table_btn').attr("disabled",true)}  //행추가불가
   }
 }
 

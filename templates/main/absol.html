@@ -1,0 +1,29 @@
+{% extends 'frame.html' %}
+
+<!--제목-->
+{% block title %}
+    앱솔
+{% endblock %}
+
+<!--내용-->
+{% block content %}
+
+앱솔루트 보드카 공식 홈페이지에서 칵테일 레시피를 가져올 수 있습니다.<br>
+<a href="https://www.absolutdrinks.com/ko/drinks/with/absolut-vodka/" target="_blank">공식홈페이지</a>
+
+<p style="margin-top: 50px;">
+    <b>url입력</b><br>
+    <span>주의 : 4개가 넘어가는 레시피의 경우 짤림, 이름이 너무 긴 경우 추가 실패할 수 있음</span>
+    <form method="post">
+        <input type="text" name="absol_url">
+        <input type="submit" formaction="/absol_process/" value="추가하기">
+    </form>
+</p>
+
+
+
+
+
+
+
+{% endblock %} 
